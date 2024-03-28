@@ -18,22 +18,38 @@ SessionManager.currLib = {}
 SessionManager.inputMap = {}
 
 SessionManager.inputMap["pop"] = function(objRef, args)
-    if objRef.handlerStack.len > 1 then
-        objRef.handlerStack = objRef.handlerStack[:-1]
-        objRef.updateCurrHandler()
-    else
+    if args.len > 1 then index = args[1] else index = -1
+    if objRef.handlerStack.len < 2 or index == 0 then
         print("Error: cannot pop local shell.")
+        return
+    end if
+    objRef.handlerStack.remove(index)
+    // If current handler was in stack, update it
+    if not objRef.handlerStack.indexOf(objRef.currHandler) then
+        objRef.updateCurrHandler(-1)
     end if
 end function
 
 SessionManager.inputMap["hstack"] = function(objRef, args)
     for handler in objRef.handlerStack
-        print(handler.classID() + ": " + handler.getLANIP())
+        if handler == objRef.currHandler then
+            print("* " + handler.classID() + ": " + handler.getLANIP())
+        else
+            print(handler.classID() + ": " + handler.getLANIP())
+        end if
     end for
 end function
 
-SessionManager.updateCurrHandler = function()
-    self.currHandler = self.handlerStack[-1]
+SessionManager.inputMap["switch"] = function(objRef, args)
+    if args.len < 2 then
+        print("Error: switch requires a handler index.")
+        return
+    end if
+    objRef.updateCurrHandler(args[1])
+end function
+
+SessionManager.updateCurrHandler = function(index)
+    self.currHandler = self.handlerStack[index]
 end function
 
 SessionManager.addHandler = function(handler)
@@ -371,27 +387,27 @@ ShellHandler.classID = "ShellHandler"
 ShellHandler.displayID = "Shell"
 
 ShellHandler.inputMap["shell"] = function(objRef, args)
-	objRef.dropShell
+    objRef.dropShell
 end function
 
 ShellHandler.inputMap["get"] = function(objRef, args)
-	if args.len > 1 then fileName = args[1] else fileName = "system.log"
+    if args.len > 1 then fileName = args[1] else fileName = "system.log"
 
-	objRef.getFile(fileName)
+    objRef.getFile(fileName)
 end function
 
 ShellHandler.inputMap["put"] = function(objRef, args)
-	if args.len > 1 then fileName = args[1] else fileName = "system.log"
+    if args.len > 1 then filePath = args[1] else filePath = "system.log"
 
-	objRef.putFile(fileName)
+    objRef.putFile(filePath)
 end function
 
 ShellHandler.inputMap["build"] = function(objRef, args)
-	if args.len > 1 then srcPath = args[1] else srcPath = "/home/guest/dddd.src"
-	if args.len > 2 then binPath = args[2] else binPath = "/home/guest"
-	if args.len > 3 then canImport = args[3] else canImport = 0
+    if args.len > 1 then srcPath = args[1] else srcPath = "/home/guest/dddd.src"
+    if args.len > 2 then binPath = args[2] else binPath = "/home/guest"
+    if args.len > 3 then canImport = args[3] else canImport = 0
 
-	objRef.buildFile(srcPath, binPath, canImport)
+    objRef.buildFile(srcPath, binPath, canImport)
 end function
 
 ShellHandler.inputMap["launch"] = function(objRef, args)
@@ -402,52 +418,51 @@ ShellHandler.inputMap["launch"] = function(objRef, args)
 end function
 
 ShellHandler.inputMap["connect"] = function(objRef, args)
-	if args.len > 1 then ip = args[1] else ip = "1.1.1.1"
-	if args.len > 2 then port = args[2].to_int else port = "22"
-	if args.len > 3 then username = args[3] else username = "root"
-	if args.len > 4 then userPass = args[4] else userPass = "root"
+    if args.len > 1 then ip = args[1] else ip = "1.1.1.1"
+    if args.len > 2 then port = args[2].to_int else port = "22"
+    if args.len > 3 then username = args[3] else username = "root"
+    if args.len > 4 then userPass = args[4] else userPass = "root"
 
-	objRef.connectService(ip, port, username, userPass)
+    objRef.connectService(ip, port, username, userPass)
 end function
 
 ShellHandler.getObject = function()
-	return self.shellObject
+    return self.shellObject
 end function
 
 // Sets stored Shell object to passed object, and calls updateComputerObject with respective Computer.
 ShellHandler.updateShellObject = function(shellObject)
-	self.shellObject = shellObject
-	self.updateComputerObject(self.shellObject.host_computer)
+    self.shellObject = shellObject
+    self.updateComputerObject(self.shellObject.host_computer)
 end function
 
 // Drops to a shell, self-explanatory.
 ShellHandler.dropShell = function()
-	self.shellObject.start_terminal
+    self.shellObject.start_terminal
 end function
 
 // Downloads specified file to local Shell.
 ShellHandler.getFile = function(fileName)
-	remotePath = self.fileObject.path + "/" + fileName
-	result = self.shellObject.scp(remotePath, current_path, get_shell)
-	if result isa string then
-		print("Error downloading file: " + result)
-	end if
+    remotePath = self.fileObject.path + "/" + fileName
+    result = self.shellObject.scp(remotePath, current_path, get_shell)
+    if result isa string then
+        print("Error downloading file: " + result)
+    end if
 end function
 
-// Uploads specified file in "/root/UploadFiles" to remote Shell.
-ShellHandler.putFile = function(fileName)
-	localPath = "/root/UploadFiles" + "/" + fileName
-	result = get_shell.scp(localPath, self.fileObject.path, self.shellObject)
-	if result isa string then
-		print("Error uploading file: " + result)
-	end if
+// Uploads specified file to remote Shell.
+ShellHandler.putFile = function(filePath)
+    result = get_shell.scp(filePath, self.fileObject.path, self.shellObject)
+    if result isa string then
+        print("Error uploading file: " + result)
+    end if
 end function
 
 ShellHandler.buildFile = function(srcPath, binPath, canImport)
-	result = self.shellObject.build(srcPath, binPath, canImport)
-	if result != "" then
-		print("Error building file: " + result)
-	end if
+    result = self.shellObject.build(srcPath, binPath, canImport)
+    if result != "" then
+        print("Error building file: " + result)
+    end if
 end function
 
 ShellHandler.launchFile = function(filePath, args)
@@ -456,16 +471,16 @@ ShellHandler.launchFile = function(filePath, args)
 end function
 
 ShellHandler.connectService = function(ip, port, username, userPass)
-	result = self.shellObject.connect_service(ip, port, username, userPass)
-	if result isa string then 
-		print("Error connecting to service: " + result)
-	end if
+    result = self.shellObject.connect_service(ip, port, username, userPass)
+    if result isa string then 
+        print("Error connecting to service: " + result)
+    end if
 
-	if typeof(result) == "shell" then
-		shell = new ShellHandler
-		shell.updateShellObject(result)
-		SessionManager.addHandler(shell)
-	end if
+    if typeof(result) == "shell" then
+        shell = new ShellHandler
+        shell.updateShellObject(result)
+        SessionManager.addHandler(shell)
+    end if
 end function
 
 ////////////////////////////////////////////////////////////////////////////////////

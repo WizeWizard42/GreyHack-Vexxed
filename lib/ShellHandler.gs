@@ -20,9 +20,9 @@ ShellHandler.inputMap["get"] = function(objRef, args)
 end function
 
 ShellHandler.inputMap["put"] = function(objRef, args)
-    if args.len > 1 then fileName = args[1] else fileName = "system.log"
+    if args.len > 1 then filePath = args[1] else filePath = "system.log"
 
-    objRef.putFile(fileName)
+    objRef.putFile(filePath)
 end function
 
 ShellHandler.inputMap["build"] = function(objRef, args)
@@ -73,10 +73,9 @@ ShellHandler.getFile = function(fileName)
     end if
 end function
 
-// Uploads specified file in "/root/UploadFiles" to remote Shell.
-ShellHandler.putFile = function(fileName)
-    localPath = "/root/UploadFiles" + "/" + fileName
-    result = get_shell.scp(localPath, self.fileObject.path, self.shellObject)
+// Uploads specified file to remote Shell.
+ShellHandler.putFile = function(filePath)
+    result = get_shell.scp(filePath, self.fileObject.path, self.shellObject)
     if result isa string then
         print("Error uploading file: " + result)
     end if

@@ -38,7 +38,7 @@ SessionManager.inputMap["switch"] = function(objRef, args)
         print("Error: switch requires a handler index.")
         return
     end if
-    objRef.updateCurrHandler(args[1])
+    objRef.updateCurrHandler(args[1].to_int)
 end function
 
 SessionManager.updateCurrHandler = function(index)
@@ -47,7 +47,7 @@ end function
 
 SessionManager.addHandler = function(handler)
     self.handlerStack.push(handler)
-    self.updateCurrHandler()
+    self.updateCurrHandler(-1)
 end function
 
 SessionManager.setCurrLib = function(val)

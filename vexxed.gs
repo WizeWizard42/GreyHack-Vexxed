@@ -54,7 +54,7 @@ end function
 
 SessionManager.addHandler = function(handler)
     self.handlerStack.push(handler)
-    self.updateCurrHandler()
+    self.updateCurrHandler(-1)
 end function
 
 SessionManager.setCurrLib = function(val)

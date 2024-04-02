@@ -54,6 +54,22 @@ SessionManager.setCurrLib = function(val)
     self.currLib = val
 end function
 
+SessionManager.initSession = function()
+    session.vexxed = {}
+    session.vexxed["session"] = self
+    session.vexxed["exploiter"] = globals.Exploiter
+    session.vexxed["homeShell"] = get_shell
+    session.vexxed["remoteShell"] = get_shell
+    session.vexxed["homeMetax"] = metaxploit
+    session.vexxed["remoteMetax"] = metaxploit
+    session.vexxed["homeCrypto"] = crypto
+end function
+
+SessionManager.importSession = function()
+    session.vexxed["remoteMetax"] = metaxploit
+    session.vexxed["remoteShell"] = get_shell
+end function
+
 SessionManager.handleInput = function(input)
     if input.len == 0 or not self.inputMap.hasIndex(input[0]) then // Empty input or invalid command?
         return

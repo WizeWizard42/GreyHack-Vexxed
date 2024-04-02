@@ -85,21 +85,17 @@ end function
 
 // Returns content of specified file. Needs to be in current directory.
 FileHandler.readFile = function(fileName)
-    for file in self.fileObject.get_files
-        if file.name == fileName then
-            return file.get_content
-        end if
-    end for
+    return self.fileObject.get_files.first("name", fileName).get_content
 end function
 
 // Deletes the file if it exists.
 FileHandler.deleteFile = function(fileName)
-    for file in self.fileObject.get_files
-        if file.name == fileName then
-            file.delete
-            return
-        end if
-    end for
+    if self.fileObject.get_files.first("name", fileName) then
+        result = self.fileObject.get_files.first("name", fileName).delete
+        if result != "" then print("Error deleting file: " + result)
+        return
+    end if
+    print("File does not exist.")
 end function
 
 // Changes directory appropriately. Currently only supports ".." (parent) or directory name.
@@ -107,12 +103,11 @@ FileHandler.changeFile = function(command)
     if command == ".." then
         self.fileObject = self.fileObject.parent
     else
-        for folder in self.fileObject.get_folders
-            if folder.name == command then
-                self.fileObject = folder
-                break
-            end if		
-        end for
+        if self.fileObject.get_folders.first("name", command) then
+            self.fileObject = self.fileObject.get_folders.first("name", command)
+        else
+            print("Directory does not exist.")
+        end if
     end if
 
     self.updateFilePath
@@ -120,7 +115,7 @@ end function
 
 FileHandler.moveFile = function(filePath, fileName)
     result = self.fileObject.move(filePath, fileName)
-    if result isa string then
+    if result != true then
         print("Error moving file: " + result)
     end if
 end function
@@ -135,23 +130,21 @@ end function
 
 // Tries to return an object's appropriate level of permission.
 FileHandler.getPerms = function()
-    while self.filePath != [""]
+    while parent(self.fileObject)
         self.changeFile("..")
     end while
-    self.changeFile("var")
-    for file in self.fileObject.get_files
-        if file.name == "system.log" then
-            if file.has_permission("w") then
-                return "root"
-            end if
 
-            if file.has_permission("r") then
-                return "user"
-            end if
-
-            return "guest"
+    root = self.fileObject.get_folders.first("path", "/root")
+    if root and root.has_permission("r") and root.has_permission("w") and root.has_permission("x") then return "root"
+    home = self.fileObject.get_folders.first("path", "/home")
+    if home then
+        users = home.get_folders.wherenot("path", "/home/guest")
+        if users then
+            for each in users
+                if each.has_permission("r") and each.has_permission("w") and each.has_permission("x") then return "user"
+            end for
         end if
-    end for
+    end if
     return "guest"
 end function
 

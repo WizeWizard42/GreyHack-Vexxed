@@ -171,7 +171,7 @@ SessionManager.inputMap["switch"] = function(objRef, args)
         print("Error: switch requires a handler index.")
         return
     end if
-    objRef.updateCurrHandler(args[1])
+    objRef.updateCurrHandler(args[1].to_int)
 end function
 
 SessionManager.updateCurrHandler = function(index)
@@ -516,7 +516,7 @@ ComputerHandler.createFolder = function(path, folder)
 end function
 
 ComputerHandler.getWiFiObjects = function(interface)
-    networks = computer.wifi_networks(interface)
+    networks = self.computerObject.wifi_networks(interface)
     if networks == null then
         print("Interface does not exist.")
         return
@@ -860,50 +860,61 @@ RevShellServer = {}
 
 RevShellServer.clients = []
 
+RevShellServer.inputMap = {}
+
+RevShellServer.inputMap["list"] = function(objRef, input)
+    objRef.listClients
+end function
+
+RevShellServer.inputMap["refresh"] = function(objRef, input)
+    objRef.updateClients
+end function
+
+RevShellServer.inputMap["use"] = function(objRef, input)
+    if input.len < 2 then
+        print("Usage: use <index>")
+        return
+    end if
+
+    shell = new ShellHandler
+    objRef.setActiveClient(input[1].to_int, shell)
+    if shell.getObject then SessionManager.addHandler(shell)
+end function
+
 RevShellServer.getClients = function()
-	return metaxploit.rshell_server
+    return metaxploit.rshell_server
 end function
 
 RevShellServer.updateClients = function()
-	self.clients = self.getClients
-	if self.clients isa list then
-		print("Clients updated successfully.")
-	else
-		print(self.clients)
-	end if
+    self.clients = self.getClients
+    if self.clients isa list then
+        print("Clients updated successfully.")
+    else
+        print(self.clients)
+    end if
 end function
 
 RevShellServer.listClients = function()
-	if self.clients.len == 0 or self.clients isa string then
-		print("No shells connected.")
-		return
-	end if
-	for i in range(0, self.clients.len - 1)
+    if self.clients.len == 0 or self.clients isa string then
+        print("No shells connected.")
+        return
+    end if
+    for i in range(0, self.clients.len - 1)
 		print("\n<b>Shell (" + (i) + ")</b>\nPublic IP: " + self.clients[i].host_computer.public_ip + "\nLocal IP: " + self.clients[i].host_computer.local_ip)
 	end for
 end function
 
 RevShellServer.setActiveClient = function(index, shellObj)
-	if self.clients[index] and self.clients isa list then
-		shellObj.updateShellObject(self.clients[index])
-	else 
-		print("Shell at index " + index + " does not exist.")
-	end if
+    if self.clients[index] and self.clients isa list then
+        shellObj.updateShellObject(self.clients[index])
+    else 
+        print("Shell at index " + index + " does not exist.")
+    end if
 end function
 
 RevShellServer.handleInput = function(input)
-    if input[0] == "list" then
-        self.listClients
-    else if input[0] == "refresh" then
-        self.updateClients
-    else if input[0].to_int isa number and input[0].to_int >= 0 then
-        shell = new ShellHandler
-        self.setActiveClient(input[0].to_int, shell)
-
-        if shell.getObject then
-			SessionManager.addHandler(shell)
-        end if
-    end if
+    if input.len == 0 or not self.inputMap.hasIndex(input[0]) then return
+    self.inputMap[input[0]](self, input)
 end function
 
 ////////////////////////////////////////////////////////////////////////////////////
@@ -991,10 +1002,11 @@ Engine.handleInput = function(input)
             end if
         end if
 
-		if command[0] == "revshell" and command.len >= 2 then
+		if command[0] == "revshell" then
 			RevShellServer.handleInput(command[1:])
+			continue
 		end if
-
+		
         SessionManager.handleInput(command)
         SessionManager.currHandler.handleInput(command)
     end for

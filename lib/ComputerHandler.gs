@@ -104,7 +104,7 @@ ComputerHandler.createFolder = function(path, folder)
 end function
 
 ComputerHandler.getWiFiObjects = function(interface)
-    networks = computer.wifi_networks(interface)
+    networks = self.computerObject.wifi_networks(interface)
     if networks == null then
         print("Interface does not exist.")
         return

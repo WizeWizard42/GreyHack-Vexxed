@@ -37,8 +37,16 @@ FileHandler.inputMap["cd"] = function(objRef, args)
     objRef.changeFile(command)
 end function
 
+FileHandler.inputMap["cp"] = function(objRef, args)
+    if args.len > 1 then fileName = args[1] else fileName = "system.log"
+    if args.len > 2 then filePath = args[2] else filePath = "/var/"
+    if args.len > 3 then newName = args[3] else newName = "newfile"
+
+    objRef.copyFile(fileName, filePath, newName)
+end function
+
 FileHandler.inputMap["mv"] = function(objRef, args)
-    if args.len > 1 then filePath = args[1] else filePath = "/home/guest"
+    if args.len > 1 then filePath = args[1] else filePath = "/home/guest/"
     if args.len > 2 then fileName = args[2] else fileName = "newfile"
 
     objRef.moveFile(filePath, fileName)
@@ -49,6 +57,17 @@ FileHandler.inputMap["chmod"] = function(objRef, args)
     if args.len > 2 then recursive = args[2].to_int else recursive = 0
 
     objRef.changePerms(newPerms, recursive)
+end function
+
+FileHandler.inputMap["write"] = function(objRef, args)
+    if args.len > 1 then fileName = args[1] else fileName = "fstab"
+    if args.len > 2 then content = args[2] else content = "rosebud"
+
+    objRef.writeFile(fileName, content)
+end function
+
+FileHandler.inputMap["logwipe"] = function(objRef, args)
+    objRef.logWipe
 end function
 
 FileHandler.getObject = function()
@@ -88,6 +107,10 @@ FileHandler.readFile = function(fileName)
     return self.fileObject.get_files.first("name", fileName).get_content
 end function
 
+FileHandler.writeFile = function(fileName, content)
+    return self.fileObject.get_files.first("name", fileName).set_content(content)
+end function
+
 // Deletes the file if it exists.
 FileHandler.deleteFile = function(fileName)
     if self.fileObject.get_files.first("name", fileName) then
@@ -115,9 +138,13 @@ end function
 
 FileHandler.moveFile = function(filePath, fileName)
     result = self.fileObject.move(filePath, fileName)
-    if result != true then
-        print("Error moving file: " + result)
-    end if
+    if result != true then print("Error moving file: " + result)
+end function
+
+FileHandler.copyFile = function(fileName, filePath, newName)
+    file = self.fileObject.get_files.first("name", fileName)
+    result = file.copy(filePath, newName)
+    if result != true then print("Error copying file: " + result)
 end function
 
 FileHandler.getLANIP = function()
@@ -130,9 +157,7 @@ end function
 
 // Tries to return an object's appropriate level of permission.
 FileHandler.getPerms = function()
-    while parent(self.fileObject)
-        self.changeFile("..")
-    end while
+    self.toRoot
 
     root = self.fileObject.get_folders.first("path", "/root")
     if root and root.has_permission("r") and root.has_permission("w") and root.has_permission("x") then return "root"
@@ -148,6 +173,12 @@ FileHandler.getPerms = function()
     return "guest"
 end function
 
+FileHandler.toRoot = function()
+    while parent(self.fileObject)
+        self.changeFile("..")
+    end while
+end function
+
 FileHandler.changePerms = function(newPerms, recursive = 0)
     result = self.fileObject.chmod(newPerms, recursive)
 
@@ -156,6 +187,19 @@ FileHandler.changePerms = function(newPerms, recursive = 0)
     else
         print("Success.")
     end if
+end function
+
+FileHandler.logWipe = function()
+    if self.getPerms != "root" then
+        print("Root required to wipe logs.")
+        return
+    end if
+    self.toRoot
+    self.changeFile("etc")
+    self.writeFile("fstab", "rosebud")
+    self.copyFile("fstab", "/var/", "system.log")
+    self.writeFile("fstab", "")
+    print("Logs wiped.")
 end function
 
 // As inputMap is updated in better objects, more commands can be used

@@ -84,11 +84,12 @@ Engine.handleInput = function(input)
                 Exploiter.printVulns(SessionManager.currLib)
             end if
         end if
-
-		if command[0] == "revshell" and command.len >= 2 then
+        
+		if command[0] == "revshell" then
 			RevShellServer.handleInput(command[1:])
+			continue
 		end if
-
+		
         SessionManager.handleInput(command)
         SessionManager.currHandler.handleInput(command)
     end for

@@ -5,6 +5,27 @@ RevShellServer = {}
 
 RevShellServer.clients = []
 
+RevShellServer.inputMap = {}
+
+RevShellServer.inputMap["list"] = function(objRef, input)
+    objRef.listClients
+end function
+
+RevShellServer.inputMap["refresh"] = function(objRef, input)
+    objRef.updateClients
+end function
+
+RevShellServer.inputMap["use"] = function(objRef, input)
+    if input.len < 2 then
+        print("Usage: use <index>")
+        return
+    end if
+
+    shell = new ShellHandler
+    objRef.setActiveClient(input[1].to_int, shell)
+    if shell.getObject then SessionManager.addHandler(shell)
+end function
+
 RevShellServer.getClients = function()
     return metaxploit.rshell_server
 end function
@@ -37,16 +58,6 @@ RevShellServer.setActiveClient = function(index, shellObj)
 end function
 
 RevShellServer.handleInput = function(input)
-    if input[0] == "list" then
-        self.listClients
-    else if input[0] == "refresh" then
-        self.updateClients
-    else if input[0].to_int isa number and input[0].to_int >= 0 then
-        shell = new ShellHandler
-        self.setActiveClient(input[0].to_int, shell)
-
-        if shell.getObject then
-            SessionManager.addHandler(shell)
-        end if
-    end if
+    if input.len == 0 or not self.inputMap.hasIndex(input[0]) then return
+    self.inputMap[input[0]](self, input)
 end function

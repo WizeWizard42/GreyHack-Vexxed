@@ -2,6 +2,12 @@ metaxploit = include_lib("/lib/metaxploit.so")
 if not metaxploit then metaxploit = include_lib(current_path + "/metaxploit.so")
 if not metaxploit then exit("Could not import metaxploit. Exiting.")
 
+crypto = include_lib("/lib/crypto.so")
+if not crypto then crypto = include_lib(current_path + "/crypto.so")
+if not crypto then print("Could not import crypto. Continuing.")
+
+session = @get_custom_object
+
 ////////////////////////////////////////////////////////////////////////////////////
 
 // File: TypeExtensions.gs
@@ -185,6 +191,22 @@ end function
 
 SessionManager.setCurrLib = function(val)
     self.currLib = val
+end function
+
+SessionManager.initSession = function()
+    session.vexxed = {}
+    session.vexxed["session"] = self
+    session.vexxed["exploiter"] = globals.Exploiter
+    session.vexxed["homeShell"] = get_shell
+    session.vexxed["remoteShell"] = get_shell
+    session.vexxed["homeMetax"] = metaxploit
+    session.vexxed["remoteMetax"] = metaxploit
+    session.vexxed["homeCrypto"] = crypto
+end function
+
+SessionManager.importSession = function()
+    session.vexxed["remoteMetax"] = metaxploit
+    session.vexxed["remoteShell"] = get_shell
 end function
 
 SessionManager.handleInput = function(input)
@@ -716,7 +738,7 @@ end function
 
 // Loads a local lib specified by path, used in local exploits. Returns a list of metaLib and lib_id.
 Exploiter.loadLib = function(filePath)
-	metaLib = metaxploit.load(filePath)
+	metaLib = session.vexxed["remoteMetax"].load(filePath)
 	if metaLib then return metaLib
 
 	print("Library was unable to be loaded.")
@@ -731,10 +753,10 @@ Exploiter.scanLib = function(metaLib)
 
 	self.scanResult[lib_id] = {}
 
-	memories = metaxploit.scan(metaLib)
+	memories = session.vexxed["homeMetax"].scan(metaLib)
 	for memory in memories
 		print("Scanning memory: " + memory)
-		self.scanResult[lib_id][memory] = self.scanParse(metaxploit.scan_address(metaLib, memory))
+		self.scanResult[lib_id][memory] = self.scanParse(session.vexxed["homeMetax"].scan_address(metaLib, memory))
 	end for
 
 	self.saveResult
@@ -743,7 +765,7 @@ end function
 
 // Loads a lib from a remote computer, used in remote exploits. Returns a NetSession object.
 Exploiter.loadRemoteLib = function(ip, port)
-	netSession = metaxploit.net_use(ip, port)
+	netSession = session.vexxed["remoteMetax"].net_use(ip, port)
 	if netSession then return netSession.dump_lib
 	print("Remote library was unable to be loaded.")
 end function
@@ -759,7 +781,7 @@ end function
 
 // Saves in-memory vulns to a file, to be parsed later.
 Exploiter.saveResult = function()
-    c = get_shell.host_computer
+    c = session.vexxed["homeShell"].host_computer
 
     if not c.File(current_path + "/payloads.db") then
         c.touch(current_path, "payloads.db")
@@ -782,7 +804,7 @@ end function
 
 // Parses payloads.db from current directory and stores in-memory.
 Exploiter.loadResult = function()
-	c = get_shell.host_computer
+	c = session.vexxed["homeShell"].host_computer
 
     if not c.File(current_path + "/payloads.db") then
         self.scanResult = {}
@@ -846,10 +868,12 @@ end function
 
 // Prints all successful attacks for provided library id.
 Exploiter.printVulns = function(lib_id)
-    print("Listing stored vulns for: " + lib_id)
-    for i in range(0, self.resultObjects[lib_id].len - 1, 1)
-        print(i + ": " + self.resultObjects[lib_id][i].getPerms + "    " + typeof(self.resultObjects[lib_id][i].getObject).color("blue") + "    " + self.resultObjects[lib_id][i].getLANIP)
-    end for
+	print("Listing stored vulns for: " + lib_id)
+	info = ""
+	for i in range(0, self.resultObjects[lib_id].len - 1, 1)
+		info = info + (str(i) + ": " + self.resultObjects[lib_id][i].getPerms + "    " + typeof(self.resultObjects[lib_id][i].getObject).color("blue") + "    " + self.resultObjects[lib_id][i].getLANIP + "\n")
+	end for
+	print(format_columns(info))
 end function
 
 ////////////////////////////////////////////////////////////////////////////////////
@@ -867,7 +891,7 @@ RevShellServer.inputMap["list"] = function(objRef, input)
 end function
 
 RevShellServer.inputMap["refresh"] = function(objRef, input)
-    objRef.updateClients
+    objRef.updateClients(get_custom_object.vexxed["remoteMetax"])
 end function
 
 RevShellServer.inputMap["use"] = function(objRef, input)
@@ -881,12 +905,12 @@ RevShellServer.inputMap["use"] = function(objRef, input)
     if shell.getObject then SessionManager.addHandler(shell)
 end function
 
-RevShellServer.getClients = function()
-    return metaxploit.rshell_server
+RevShellServer.getClients = function(metaxLib)
+    return metaxLib.rshell_server
 end function
 
-RevShellServer.updateClients = function()
-    self.clients = self.getClients
+RevShellServer.updateClients = function(metaxLib)
+    self.clients = self.getClients(metaxLib)
     if self.clients isa list then
         print("Clients updated successfully.")
     else
@@ -926,12 +950,24 @@ Engine = {}
 Engine.startEngine = function()
     self.printSplash
     self.promptPassword
-    Exploiter.loadResult
+    self.loadSession
+    session.vexxed["exploiter"].loadResult
     shell = new ShellHandler
     shell.updateShellObject(get_shell)
-    SessionManager.addHandler(shell)
-	RevShellServer.updateClients
+    session.vexxed["session"].addHandler(shell)
+	RevShellServer.updateClients(session.vexxed["remoteMetax"])
     self.promptUser
+end function
+
+Engine.loadSession = function()
+    if get_custom_object.hasIndex("vexxed") then
+        print("Session found. Importing objects...")
+        SessionManager.importSession
+        return
+    end if
+
+    print("No session found or running from home. Creating new session...")
+    SessionManager.initSession
 end function
 
 Engine.printSplash = function()
@@ -954,7 +990,7 @@ end function
 
 Engine.promptUser = function()
     while true
-        input = user_input("[" + SessionManager.currHandler.displayID + ":" + SessionManager.currHandler.getPubIP + ":" + SessionManager.currHandler.getLANIP + "] " + SessionManager.currHandler.fileObject.path + "# ")
+        input = user_input("[" + session.vexxed["session"].currHandler.displayID + ":" + session.vexxed["session"].currHandler.getPubIP + ":" + session.vexxed["session"].currHandler.getLANIP + "] " + session.vexxed["session"].currHandler.fileObject.path + "# ")
         self.handleInput(input)
     end while
 end function
@@ -972,15 +1008,15 @@ Engine.handleInput = function(input)
             overflowKey = "secstream"
             if command.len >= 4 then overflowKey = command[3]
 
-            SessionManager.setCurrLib(Exploiter.scanPort(command[1], command[2].to_int))
+            session.vexxed["session"].setCurrLib(session.vexxed["exploiter"].scanPort(command[1], command[2].to_int))
             
-            Exploiter.crackLib(SessionManager.currLib, overflowKey)
+            session.vexxed["exploiter"].crackLib(session.vexxed["session"].currLib, overflowKey)
 
-            Exploiter.printVulns(SessionManager["currLib"])
+            session.vexxed["exploiter"].printVulns(session.vexxed["session"]["currLib"])
         end if
 
         if command[0] == "use" and command.len == 2 then
-            SessionManager.addHandler(Exploiter.resultObjects[SessionManager.currLib][command[1].to_int])
+            session.vexxed["session"].addHandler(session.vexxed["exploiter"].resultObjects[session.vexxed["session"].currLib][command[1].to_int])
         end if
 
         if command[0] == "enumerate" and command.len == 2 then
@@ -988,27 +1024,27 @@ Engine.handleInput = function(input)
         end if
 
         if command[0] == "local" and command.len >= 2 then
-            metaLib = Exploiter.loadLib(command[1])
+            metaLib = session.vexxed["exploiter"].loadLib(command[1])
 
             if metaLib then
                 overflowKey = "secstream"
                 if command.len >= 3 then overflowKey = command[2]
 
-                SessionManager.setCurrLib(Exploiter.scanLib(metaLib))
+                session.vexxed["session"].setCurrLib(session.vexxed["exploiter"].scanLib(metaLib))
 
-                Exploiter.crackLib(SessionManager.currLib, overflowKey)
+                session.vexxed["exploiter"].crackLib(session.vexxed["session"].currLib, overflowKey)
 
-                Exploiter.printVulns(SessionManager.currLib)
+                session.vexxed["exploiter"].printVulns(session.vexxed["session"].currLib)
             end if
         end if
-
+        
 		if command[0] == "revshell" then
 			RevShellServer.handleInput(command[1:])
 			continue
 		end if
 		
-        SessionManager.handleInput(command)
-        SessionManager.currHandler.handleInput(command)
+        session.vexxed["session"].handleInput(command)
+        session.vexxed["session"].currHandler.handleInput(command)
     end for
 end function
 

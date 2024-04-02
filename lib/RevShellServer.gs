@@ -12,7 +12,7 @@ RevShellServer.inputMap["list"] = function(objRef, input)
 end function
 
 RevShellServer.inputMap["refresh"] = function(objRef, input)
-    objRef.updateClients
+    objRef.updateClients(get_custom_object.vexxed["remoteMetax"])
 end function
 
 RevShellServer.inputMap["use"] = function(objRef, input)
@@ -26,12 +26,12 @@ RevShellServer.inputMap["use"] = function(objRef, input)
     if shell.getObject then SessionManager.addHandler(shell)
 end function
 
-RevShellServer.getClients = function()
-    return metaxploit.rshell_server
+RevShellServer.getClients = function(metaxLib)
+    return metaxLib.rshell_server
 end function
 
-RevShellServer.updateClients = function()
-    self.clients = self.getClients
+RevShellServer.updateClients = function(metaxLib)
+    self.clients = self.getClients(metaxLib)
     if self.clients isa list then
         print("Clients updated successfully.")
     else

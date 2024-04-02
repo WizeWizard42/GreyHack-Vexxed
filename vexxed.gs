@@ -4,6 +4,132 @@ if not metaxploit then exit("Could not import metaxploit. Exiting.")
 
 ////////////////////////////////////////////////////////////////////////////////////
 
+// File: TypeExtensions.gs
+//LinQ lib functionality for greyscript
+//By MachaCeleste 20240205
+map.first = function(key, value)
+    for each in self.indexes
+        if self[each][key] == value then return self[each]
+    end for
+end function
+map.where = function(key, value)
+    ret = {}
+    for each in self.indexes
+        if self[each][key] == value then ret.push(self[each])
+    end for
+    return ret
+end function
+map.wherenot = function(key, value)
+    ret = {}
+    for each in self.indexes
+        if self[each][key] != value then ret.push(self[each])
+    end for
+    return ret
+end function
+list.first = function(key, value)
+    for each in self
+        if typeof(each) == "string" then
+            if key == "is" and each == value then return each
+            if key == "contains" and each.is_match(value) then return each
+        else if typeof(each) == "file" then
+            if key == "name" and each.name == value then return each
+            if key == "namehas" and each.name.is_match(value) then ret.push(each)
+            if key == "path" and each.path == value then return each
+            if key == "permissions" and each.permissions == value then return each
+            if key == "has_permission" then
+                v = value.values
+                c = ""
+                for p in v
+                    if each.has_permission(p) then c = c + p
+                end for
+                if c == value then return each
+            end if
+            if key == "size" and each.size == value then return each
+        else if typeof(each) == "port" then
+            if key == "port_number" and each.port_number == value then return each
+            if key == "is_closed" and each.is_closed == value then return each
+            if key == "get_lan_ip" and each.get_lan_ip == value then return each
+        else if typeof(each) == "map" then
+            if each[key] == value then return each
+        end if
+    end for
+end function
+list.where = function(key, value)
+    ret = []
+    for each in self
+        if typeof(each) == "string" then
+            if key == "is" and each == value then ret.push(each)
+            if key == "contains" and each.is_match(value) then ret.push(each)
+        else if typeof(each) == "file" then
+            if key == "name" and each.name == value then ret.push(each)
+            if key == "namehas" and each.name.is_match(value) then ret.push(each)
+            if key == "path" and each.path == value then ret.push(each)
+            if key == "permissions" and each.permissions == value then ret.push(each)
+            if key == "has_permission" then
+                v = value.values
+                c = ""
+                for p in v
+                    if each.has_permission(p) then c = c + p
+                end for
+                if c == value then ret.push(each)
+            end if
+            if key == "size" and each.size == value then ret.push(each)
+        else if typeof(each) == "port" then
+            if key == "port_number" and each.port_number == value then ret.push(each)
+            if key == "is_closed" and each.is_closed == value then ret.push(each)
+            if key == "get_lan_ip" and each.get_lan_ip == value then ret.push(each)
+        else if typeof(each) == "map" then
+            if each[key] == value then ret.push(each)
+        end if
+    end for
+    return ret
+end function
+list.wherenot = function(key, value)
+    ret = []
+    for each in self
+        if typeof(each) == "string" then
+            if key == "is" and each != value then ret.push(each)
+            if key == "contains" and not each.is_match(value) then ret.push(each)
+        else if typeof(each) == "file" then
+            if key == "name" and each.name != value then ret.push(each)
+            if key == "namehas" and each.name.is_match(value) then ret.push(each)
+            if key == "path" and each.path != value then ret.push(each)
+            if key == "permissions" and each.permissions != value then ret.push(each)
+            if key == "has_permission" then
+                v = value.values
+                c = ""
+                for p in v
+                    if each.has_permission(p) then c = c + p
+                end for
+                if c != value then ret.push(each)
+            end if
+            if key == "size" and each.size != value then ret.push(each)
+        else if typeof(each) == "port" then
+            if key == "port_number" and each.port_number != value then ret.push(each)
+            if key == "is_closed" and each.is_closed != value then ret.push(each)
+            if key == "get_lan_ip" and each.get_lan_ip != value then ret.push(each)
+        else if typeof(each) == "map" then
+            if each[key] != value then ret.push(each)
+        end if
+    end for
+    return ret
+end function
+string.regex_escape = function
+    result = self
+    for x in "+*?^$.[]{}()|/"
+        result = result.replace("\"+x, "\"+x)
+    end for
+    return result
+end function
+
+//Simple string color lib functionality for greyscript
+// By MachaCeleste 20240305
+string.color = function(hexc)
+    return "<color=" + hexc + ">" + self + "</color>"
+end function
+
+////////////////////////////////////////////////////////////////////////////////////
+
 // File: SessionManager.gs
 // SessionManager class. Handles script state and manages modifications to user session.
 // TODO: Method for loading and saving a config file
@@ -88,117 +214,112 @@ FileHandler.inputMap = {}
 
 // objRef is a passed reference to the outer Map, used to bypass scope limitations. Serves as a manual "self".
 FileHandler.inputMap["ls"] = function(objRef, args)
-	print(objRef.getFiles)
+    print(objRef.getFiles)
 end function
 
 FileHandler.inputMap["cat"] = function(objRef, args)
-	if args.len > 1 then fileName = args[1] else fileName = "passwd"
+    if args.len > 1 then fileName = args[1] else fileName = "passwd"
 
-	print(objRef.readFile(fileName))
+    print(objRef.readFile(fileName))
 end function
 
 FileHandler.inputMap["rm"] = function(objRef, args)
-	if args.len > 1 then fileName = args[1] else fileName = "passwd"
+    if args.len > 1 then fileName = args[1] else fileName = "passwd"
 
-	objRef.deleteFile(fileName)
+    objRef.deleteFile(fileName)
 end function
 
 FileHandler.inputMap["cd"] = function(objRef, args)
-	if args.len > 1 then command = args[1] else command = "var"
+    if args.len > 1 then command = args[1] else command = "var"
 
-	objRef.changeFile(command)
+    objRef.changeFile(command)
 end function
 
 FileHandler.inputMap["mv"] = function(objRef, args)
-	if args.len > 1 then filePath = args[1] else filePath = "/home/guest"
-	if args.len > 2 then fileName = args[2] else fileName = "newfile"
+    if args.len > 1 then filePath = args[1] else filePath = "/home/guest"
+    if args.len > 2 then fileName = args[2] else fileName = "newfile"
 
-	objRef.moveFile(filePath, fileName)
+    objRef.moveFile(filePath, fileName)
 end function
 
 FileHandler.inputMap["chmod"] = function(objRef, args)
-	if args.len > 1 then newPerms = args[1] else newPerms = "o+rwx"
-	if args.len > 2 then recursive = args[2].to_int else recursive = 0
+    if args.len > 1 then newPerms = args[1] else newPerms = "o+rwx"
+    if args.len > 2 then recursive = args[2].to_int else recursive = 0
 
-	objRef.changePerms(newPerms, recursive)
+    objRef.changePerms(newPerms, recursive)
 end function
 
 FileHandler.getObject = function()
-	return self.fileObject
+    return self.fileObject
 end function
 
 // Sets stored File object to passed object, and updates stored path.
 FileHandler.updateFileObject = function(fileObject)
-	self.fileObject = fileObject
-	self.updateFilePath
+    self.fileObject = fileObject
+    self.updateFilePath
 end function
 
 FileHandler.updateFilePath = function()
-	if not self.fileObject then
-		self.filePath = [""]
-	else
-		self.filePath = self.fileObject.path.split("/")
-		self.filePath.remove(0)
-	end if	
+    if not self.fileObject then
+        self.filePath = [""]
+    else
+        self.filePath = self.fileObject.path.split("/")
+        self.filePath.remove(0)
+    end if	
 end function
 
 // Prints out files and folders in File object's directory.
 FileHandler.getFiles = function()
-	for file in self.fileObject.get_files
-		print(file.permissions + " " + file.group + " " + file.owner + " " + file.size + " " + file.name)
-	end for
-	
-	for folder in self.fileObject.get_folders
-		print(folder.permissions + " " + folder.group + " " + folder.owner + " " + folder.size + " " + folder.name)
-	end for
+    for file in self.fileObject.get_files
+        print(file.permissions + " " + file.group + " " + file.owner + " " + file.size + " " + file.name)
+    end for
+    
+    for folder in self.fileObject.get_folders
+        print(folder.permissions + " " + folder.group + " " + folder.owner + " " + folder.size + " " + folder.name)
+    end for
 
-	return true
+    return true
 end function
 
 // Returns content of specified file. Needs to be in current directory.
 FileHandler.readFile = function(fileName)
-	for file in self.fileObject.get_files
-		if file.name == fileName then
-			return file.get_content
-		end if
-	end for
+    return self.fileObject.get_files.first("name", fileName).get_content
 end function
 
 // Deletes the file if it exists.
 FileHandler.deleteFile = function(fileName)
-	for file in self.fileObject.get_files
-		if file.name == fileName then
-			file.delete
-			return
-		end if
-	end for
+    if self.fileObject.get_files.first("name", fileName) then
+        result = self.fileObject.get_files.first("name", fileName).delete
+        if result != "" then print("Error deleting file: " + result)
+        return
+    end if
+    print("File does not exist.")
 end function
 
 // Changes directory appropriately. Currently only supports ".." (parent) or directory name.
 FileHandler.changeFile = function(command)
-	if command == ".." then
-		self.fileObject = self.fileObject.parent
-	else
-		for folder in self.fileObject.get_folders
-			if folder.name == command then
-				self.fileObject = folder
-				break
-			end if		
-		end for
-	end if
+    if command == ".." then
+        self.fileObject = self.fileObject.parent
+    else
+        if self.fileObject.get_folders.first("name", command) then
+            self.fileObject = self.fileObject.get_folders.first("name", command)
+        else
+            print("Directory does not exist.")
+        end if
+    end if
 
-	self.updateFilePath
+    self.updateFilePath
 end function
 
 FileHandler.moveFile = function(filePath, fileName)
-	result = self.fileObject.move(filePath, fileName)
-	if result isa string then
-		print("Error moving file: " + result)
-	end if
+    result = self.fileObject.move(filePath, fileName)
+    if result != true then
+        print("Error moving file: " + result)
+    end if
 end function
 
 FileHandler.getLANIP = function()
-	return "N/A"
+    return "N/A"
 end function
 
 FileHandler.getPubIP = function()
@@ -207,44 +328,42 @@ end function
 
 // Tries to return an object's appropriate level of permission.
 FileHandler.getPerms = function()
-	while self.filePath != [""]
-		self.changeFile("..")
-	end while
-	self.changeFile("var")
-	for file in self.fileObject.get_files
-		if file.name == "system.log" then
-			if file.has_permission("w") then
-				return "root"
-			end if
+    while parent(self.fileObject)
+        self.changeFile("..")
+    end while
 
-			if file.has_permission("r") then
-				return "user"
-			end if
-
-			return "guest"
-		end if
-	end for
-	return "guest"
+    root = self.fileObject.get_folders.first("path", "/root")
+    if root and root.has_permission("r") and root.has_permission("w") and root.has_permission("x") then return "root"
+    home = self.fileObject.get_folders.first("path", "/home")
+    if home then
+        users = home.get_folders.wherenot("path", "/home/guest")
+        if users then
+            for each in users
+                if each.has_permission("r") and each.has_permission("w") and each.has_permission("x") then return "user"
+            end for
+        end if
+    end if
+    return "guest"
 end function
 
 FileHandler.changePerms = function(newPerms, recursive = 0)
-	result = self.fileObject.chmod(newPerms, recursive)
+    result = self.fileObject.chmod(newPerms, recursive)
 
-	if result == "" then
-		print("Error changing permissions: " + result)
-	else
-		print("Success.")
-	end if
+    if result == "" then
+        print("Error changing permissions: " + result)
+    else
+        print("Success.")
+    end if
 end function
 
 // As inputMap is updated in better objects, more commands can be used
 FileHandler.handleInput = function(input)
-	if input.len == 0 or not self.inputMap.hasIndex(input[0]) then // Empty input or invalid command?
-		return
-	end if
+    if input.len == 0 or not self.inputMap.hasIndex(input[0]) then // Empty input or invalid command?
+        return
+    end if
 
-	self.inputMap[input[0]](self, input)
-end function		
+    self.inputMap[input[0]](self, input)
+end function
 
 ////////////////////////////////////////////////////////////////////////////////////
 
@@ -259,115 +378,115 @@ ComputerHandler.classID = "ComputerHandler"
 ComputerHandler.displayID = "Computer"
 
 ComputerHandler.inputMap["ps"] = function(objRef, args)
-	print(objRef.getProcesses)
+    print(objRef.getProcesses)
 end function
 
 ComputerHandler.inputMap["kill"] = function(objRef, args)
-	if args.len > 1 then pid = args[1] else pid = "0"
+    if args.len > 1 then pid = args[1] else pid = "0"
 
-	objRef.closeProcess(pid.to_int)
+    objRef.closeProcess(pid.to_int)
 end function
 
 ComputerHandler.inputMap["useradd"] = function(objRef, args)
-	if args.len > 1 then username = args[1] else username = "user"
+    if args.len > 1 then username = args[1] else username = "user"
 
-	objRef.userAdd(username, "secretpassword")
+    objRef.userAdd(username, "secretpassword")
 end function
 
 ComputerHandler.inputMap["passwd"] = function(objRef, args)
-	if args.len > 1 then username = args[1] else username = "user"
-	if args.len > 2 then pass = args[2] else pass = "secretpasswd"
+    if args.len > 1 then username = args[1] else username = "user"
+    if args.len > 2 then pass = args[2] else pass = "secretpasswd"
 
-	objRef.changePass(username, pass)
+    objRef.changePass(username, pass)
 end function
 
 ComputerHandler.inputMap["touch"] = function(objRef, args)
-	if args.len > 1 then fileName = args[1] else fileName = "file.txt"
+    if args.len > 1 then fileName = args[1] else fileName = "file.txt"
 
-	objRef.createFile(objRef.fileObject.path, fileName)
+    objRef.createFile(objRef.fileObject.path, fileName)
 end function
 
 ComputerHandler.inputMap["mkdir"] = function(objRef, args)
-	if args.len > 1 then folder = args[1] else folder = "dir"
+    if args.len > 1 then folder = args[1] else folder = "dir"
 
-	objRef.createFolder(objRef.fileObject.path, folder)
+    objRef.createFolder(objRef.fileObject.path, folder)
 end function
 
 ComputerHandler.inputMap["iwlist"] = function(objRef, args)
-	if args.len > 1 then interface = args[1] else interface = "wlan0"
+    if args.len > 1 then interface = args[1] else interface = "wlan0"
 
-	objRef.getWiFiObjects(interface)
+    objRef.getWiFiObjects(interface)
 end function
 
 ComputerHandler.getObject = function()
-	return self.computerObject
+    return self.computerObject
 end function
 
 // Updates with respective Computer object, then updates File object with respective path.
 ComputerHandler.updateComputerObject = function(computerObject)
-	self.computerObject = computerObject
-	self.updateFileObject(computerObject.File("/" + self.filePath.join("/")))
+    self.computerObject = computerObject
+    self.updateFileObject(computerObject.File("/" + self.filePath.join("/")))
 end function
 
 // Returns all processes running on stored Computer.
 ComputerHandler.getProcesses = function()
-	return self.computerObject.show_procs
+    return self.computerObject.show_procs
 end function
 
 // Kills process by pid.
 ComputerHandler.closeProcess = function(pid)
-	result = self.computerObject.close_program(pid)
-	if result isa string then
-		print("Error killing process: " + result)
-	end if
+    result = self.computerObject.close_program(pid)
+    if result != true then
+        print("Error killing process: " + result)
+    end if
 end function
 
 // Adds a user, using stored Computer.
 ComputerHandler.userAdd = function(username, password)
-	result = self.computerObject.create_user(username, password)
-	if result isa string then
-		print("Error adding user: " + result)
-	end if
+    result = self.computerObject.create_user(username, password)
+    if result != true then
+        print("Error adding user: " + result)
+    end if
 end function
 
 ComputerHandler.changePass = function(username, password)
-	result = self.computerObject.change_password(username, password)
-	if result isa string then
-		print("Error changing password: " + result)
-	end if
+    result = self.computerObject.change_password(username, password)
+    if result != true then
+        print("Error changing password: " + result)
+    end if
 end function
 
 // Creates a file, like "touch".
 ComputerHandler.createFile = function(path, fileName)
-	result = self.computerObject.touch(path, fileName)
-	if result isa string then
-		print("Error creating file: " + result)
-	end if
+    result = self.computerObject.touch(path, fileName)
+    if result != true then
+        print("Error creating file: " + result)
+    end if
 end function
 
 ComputerHandler.createFolder = function(path, folder)
-	result = self.computerObject.create_folder(path, folder)
-	if result isa string then
-		print("Error creating folder: " + result)
-	end if
+    result = self.computerObject.create_folder(path, folder)
+    if result != trie then
+        print("Error creating folder: " + result)
+    end if
 end function
 
 ComputerHandler.getWiFiObjects = function(interface)
-	networks = computer.wifi_networks(interface)
-	if networks == null then
-		print("Interface does not exist.")
-		return
-	end if
+    networks = computer.wifi_networks(interface)
+    if networks == null then
+        print("Interface does not exist.")
+        return
+    end if
 
-	info = "BSSID PWR ESSID"
-	for network in networks
-		info = info + "\n" + network
-	end for
-	print(format_columns(info))
+    info = "BSSID PWR ESSID"
+    for network in networks
+        info = info + "\n" + network
+    end for
+    print(format_columns(info))
 end function
 
 ComputerHandler.getLANIP = function()
-	return self.computerObject.local_ip
+    return self.computerObject.local_ip
 end function
 
 ComputerHandler.getPubIP = function()
@@ -445,7 +564,7 @@ end function
 ShellHandler.getFile = function(fileName)
     remotePath = self.fileObject.path + "/" + fileName
     result = self.shellObject.scp(remotePath, current_path, get_shell)
-    if result isa string then
+    if result != true then
         print("Error downloading file: " + result)
     end if
 end function
@@ -453,7 +572,7 @@ end function
 // Uploads specified file to remote Shell.
 ShellHandler.putFile = function(filePath)
     result = get_shell.scp(filePath, self.fileObject.path, self.shellObject)
-    if result isa string then
+    if result != true then
         print("Error uploading file: " + result)
     end if
 end function
@@ -490,33 +609,31 @@ end function
 Enumerator = {}
 
 Enumerator.fullEnumerate = function(ip)
-	print("whois " + ip + ":")
-	print(whois(ip))
-	
-	router = get_router(ip)
-	print("\nRouter LAN address: " + router.local_ip)
-	print("\nPort-forwards detected: ")
-	for port in router.used_ports
-		print(port.port_number + "  open:" + (not port.is_closed) + "  " + router.port_info(port) + "  " + port.get_lan_ip)
-	end for
-	
-	print("\nFirewall rules: ")
-	for rule in router.firewall_rules
-		print(rule)
-	end for
-	
-	print("\nLocal IPs detected: ")
-	for lan in router.devices_lan_ip
-		if lan == router.local_ip then continue
-		
-		print("\nLAN: " + lan)
-		print("Ports detected: ")
-		for port in router.device_ports(lan)
-			if port.port_number == 8080 then print("<color=blue>Router/switch found! ")
-			
-			print(port.port_number + "  open:" + (not port.is_closed) + "  " + router.port_info(port) + "  " + port.get_lan_ip)
-		end for
-	end for
+    print("whois " + ip + ":")
+    print(whois(ip))
+    
+    router = get_router(ip)
+    print("\nRouter LAN address: " + router.local_ip)
+    print("\nPort-forwards detected: ")
+    for port in router.used_ports
+        print(port.port_number + "  open:" + (not port.is_closed) + "  " + router.port_info(port) + "  " + port.get_lan_ip)
+    end for
+    
+    print("\nFirewall rules: ")
+    for rule in router.firewall_rules
+        print(rule)
+    end for
+    
+    print("\nLocal IPs detected: ")
+    for lan in router.devices_lan_ip
+        if lan == router.local_ip then continue
+        
+        print("\nLAN: " + lan)
+        print("Ports detected: ")
+        for port in router.device_ports(lan)
+            print(port.port_number + "  open:" + (not port.is_closed) + "  " + router.port_info(port) + "  " + port.get_lan_ip)
+        end for
+    end for
 end function
 
 ////////////////////////////////////////////////////////////////////////////////////
@@ -556,12 +673,9 @@ end function
 // Loads a local lib specified by path, used in local exploits. Returns a list of metaLib and lib_id.
 Exploiter.loadLib = function(filePath)
 	metaLib = metaxploit.load(filePath)
-	if not metaLib then
-		print("Library was unable to be loaded.")
-		return
-	end if
+	if metaLib then return metaLib
 
-	return metaLib
+	print("Library was unable to be loaded.")
 end function
 
 // Scans provided MetaLib and saves result vulns. Returns lib_id.
@@ -569,15 +683,13 @@ Exploiter.scanLib = function(metaLib)
 	lib_id = metaLib.lib_name + "-" + metaLib.version
 	self.metaLibs[lib_id] = metaLib
 
-	if self.scanResult.hasIndex(lib_id) then
-		return
-	end if
+	if self.scanResult.hasIndex(lib_id) then return
 
 	self.scanResult[lib_id] = {}
 
 	memories = metaxploit.scan(metaLib)
 	for memory in memories
-		print("<color=red>Scanning memory: " + memory)
+		print("Scanning memory: " + memory)
 		self.scanResult[lib_id][memory] = self.scanParse(metaxploit.scan_address(metaLib, memory))
 	end for
 
@@ -585,9 +697,18 @@ Exploiter.scanLib = function(metaLib)
 	return lib_id
 end function
 
+// Loads a lib from a remote computer, used in remote exploits. Returns a NetSession object.
+Exploiter.loadRemoteLib = function(ip, port)
+	netSession = metaxploit.net_use(ip, port)
+	if netSession then return netSession.dump_lib
+	print("Remote library was unable to be loaded.")
+end function
+
 // Scans respective port's MetaLib and returns lib_id, used as an id in other methods.
 Exploiter.scanPort = function(ip, port)
-	metaLib = metaxploit.net_use(ip, port).dump_lib
+	metaLib = self.loadRemoteLib(ip, port)
+	if not metaLib then return
+
 	self.scanLib(metaLib)
 	return metaLib.lib_name + "-" + metaLib.version
 end function
@@ -683,10 +804,9 @@ end function
 Exploiter.printVulns = function(lib_id)
     print("Listing stored vulns for: " + lib_id)
     for i in range(0, self.resultObjects[lib_id].len - 1, 1)
-        print(i + ": " + self.resultObjects[lib_id][i].getPerms + "    <color=blue>" + typeof(self.resultObjects[lib_id][i].getObject) + "    " + self.resultObjects[lib_id][i].getLANIP)
+        print(i + ": " + self.resultObjects[lib_id][i].getPerms + "    " + typeof(self.resultObjects[lib_id][i].getObject).color("blue") + "    " + self.resultObjects[lib_id][i].getLANIP)
     end for
 end function
-
 
 ////////////////////////////////////////////////////////////////////////////////////
 

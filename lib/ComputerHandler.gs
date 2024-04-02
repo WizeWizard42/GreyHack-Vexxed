@@ -68,7 +68,7 @@ end function
 // Kills process by pid.
 ComputerHandler.closeProcess = function(pid)
     result = self.computerObject.close_program(pid)
-    if result isa string then
+    if result != true then
         print("Error killing process: " + result)
     end if
 end function
@@ -76,14 +76,14 @@ end function
 // Adds a user, using stored Computer.
 ComputerHandler.userAdd = function(username, password)
     result = self.computerObject.create_user(username, password)
-    if result isa string then
+    if result != true then
         print("Error adding user: " + result)
     end if
 end function
 
 ComputerHandler.changePass = function(username, password)
     result = self.computerObject.change_password(username, password)
-    if result isa string then
+    if result != true then
         print("Error changing password: " + result)
     end if
 end function
@@ -91,14 +91,14 @@ end function
 // Creates a file, like "touch".
 ComputerHandler.createFile = function(path, fileName)
     result = self.computerObject.touch(path, fileName)
-    if result isa string then
+    if result != true then
         print("Error creating file: " + result)
     end if
 end function
 
 ComputerHandler.createFolder = function(path, folder)
     result = self.computerObject.create_folder(path, folder)
-    if result isa string then
+    if result != trie then
         print("Error creating folder: " + result)
     end if
 end function

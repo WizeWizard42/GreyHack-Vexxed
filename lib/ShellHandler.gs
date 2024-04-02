@@ -68,7 +68,7 @@ end function
 ShellHandler.getFile = function(fileName)
     remotePath = self.fileObject.path + "/" + fileName
     result = self.shellObject.scp(remotePath, current_path, get_shell)
-    if result isa string then
+    if result != true then
         print("Error downloading file: " + result)
     end if
 end function
@@ -76,7 +76,7 @@ end function
 // Uploads specified file to remote Shell.
 ShellHandler.putFile = function(filePath)
     result = get_shell.scp(filePath, self.fileObject.path, self.shellObject)
-    if result isa string then
+    if result != true then
         print("Error uploading file: " + result)
     end if
 end function

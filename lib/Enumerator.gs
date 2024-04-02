@@ -24,8 +24,6 @@ Enumerator.fullEnumerate = function(ip)
         print("\nLAN: " + lan)
         print("Ports detected: ")
         for port in router.device_ports(lan)
-            if port.port_number == 8080 then print("<color=blue>Router/switch found! ")
-            
             print(port.port_number + "  open:" + (not port.is_closed) + "  " + router.port_info(port) + "  " + port.get_lan_ip)
         end for
     end for

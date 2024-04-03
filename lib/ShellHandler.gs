@@ -40,6 +40,13 @@ ShellHandler.inputMap["launch"] = function(objRef, args)
 	objRef.launchFile(filePath, launchParams)
 end function
 
+ShellHandler.inputMap["sudo"] = function(objRef, args)
+    if args.len > 1 then userName = args[1] else userName = "root"
+    if args.len > 2 then userPass = args[2] else userPass = "root"
+
+    objRef.trySudo(userName, userPass)
+end function
+
 ShellHandler.inputMap["connect"] = function(objRef, args)
     if args.len > 1 then ip = args[1] else ip = "1.1.1.1"
     if args.len > 2 then port = args[2].to_int else port = "22"
@@ -67,7 +74,7 @@ end function
 // Downloads specified file to local Shell.
 ShellHandler.getFile = function(fileName)
     remotePath = self.fileObject.path + "/" + fileName
-    result = self.shellObject.scp(remotePath, current_path, get_shell)
+    result = self.shellObject.scp(remotePath, "/root/Loot/", session.vexxed["homeShell"])
     if result != true then
         print("Error downloading file: " + result)
     end if
@@ -75,10 +82,23 @@ end function
 
 // Uploads specified file to remote Shell.
 ShellHandler.putFile = function(filePath)
-    result = get_shell.scp(filePath, self.fileObject.path, self.shellObject)
+    result = session.vexxed["homeShell"].scp(filePath, self.fileObject.path, self.shellObject)
     if result != true then
         print("Error uploading file: " + result)
     end if
+end function
+
+ShellHandler.trySudo = function(userName, userPass)
+    result = get_shell(userName, userPass)
+    if not result then
+        print("User/pass combo incorrect. Remember, this only works on the current remoteShell.")
+        return
+    end if
+
+    shell = new ShellHandler
+    shell.updateShellObject(result)
+    session.vexxed["session"].addHandler(shell)
+    session.vexxed["remoteShell"] = result
 end function
 
 ShellHandler.buildFile = function(srcPath, binPath, canImport)

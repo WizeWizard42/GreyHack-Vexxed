@@ -602,6 +602,13 @@ ShellHandler.inputMap["launch"] = function(objRef, args)
 	objRef.launchFile(filePath, launchParams)
 end function
 
+ShellHandler.inputMap["sudo"] = function(objRef, args)
+    if args.len > 1 then userName = args[1] else userName = "root"
+    if args.len > 2 then userPass = args[2] else userPass = "root"
+
+    objRef.trySudo(userName, userPass)
+end function
+
 ShellHandler.inputMap["connect"] = function(objRef, args)
     if args.len > 1 then ip = args[1] else ip = "1.1.1.1"
     if args.len > 2 then port = args[2].to_int else port = "22"
@@ -629,7 +636,7 @@ end function
 // Downloads specified file to local Shell.
 ShellHandler.getFile = function(fileName)
     remotePath = self.fileObject.path + "/" + fileName
-    result = self.shellObject.scp(remotePath, current_path, get_shell)
+    result = self.shellObject.scp(remotePath, "/root/Loot/", session.vexxed["homeShell"])
     if result != true then
         print("Error downloading file: " + result)
     end if
@@ -637,10 +644,23 @@ end function
 
 // Uploads specified file to remote Shell.
 ShellHandler.putFile = function(filePath)
-    result = get_shell.scp(filePath, self.fileObject.path, self.shellObject)
+    result = session.vexxed["homeShell"].scp(filePath, self.fileObject.path, self.shellObject)
     if result != true then
         print("Error uploading file: " + result)
     end if
+end function
+
+ShellHandler.trySudo = function(userName, userPass)
+    result = get_shell(userName, userPass)
+    if not result then
+        print("User/pass combo incorrect. Remember, this only works on the current remoteShell.")
+        return
+    end if
+
+    shell = new ShellHandler
+    shell.updateShellObject(result)
+    session.vexxed["session"].addHandler(shell)
+    session.vexxed["remoteShell"] = result
 end function
 
 ShellHandler.buildFile = function(srcPath, binPath, canImport)
@@ -783,50 +803,61 @@ end function
 Exploiter.saveResult = function()
     c = session.vexxed["homeShell"].host_computer
 
-    if not c.File(current_path + "/payloads.db") then
-        c.touch(current_path, "payloads.db")
+    if not c.File("/root/payloads.db") then
+        c.touch("/root", "payloads.db")
     end if
-    database_file = c.File(current_path + "/payloads.db")
+    database_file = c.File("/root/payloads.db")
 
 	result_string = ""
 
     for lib_id in self.scanResult.indexes
-		result_string = result_string + lib_id + ":"
-		for memory in self.scanResult[lib_id].indexes
-			result_string = result_string + memory + ";"
-			result_string = result_string + self.scanResult[lib_id][memory].join(",") + "."
-		end for
-		result_string = result_string + "#"
-	end for
+        result_string = result_string + lib_id + "|"
+        
+        memory_values = []
+        for memory in self.scanResult[lib_id].indexes
+            values = self.scanResult[lib_id][memory].join(",")
+            memory_values.push(memory + ":" + values)
+        end for
+        
+        result_string = result_string + memory_values.join("|") + char(10)
+    end for
 
-	database_file.set_content(result_string)
+    print(result_string)
+    database_file.set_content(result_string)
 end function
 
 // Parses payloads.db from current directory and stores in-memory.
 Exploiter.loadResult = function()
-	c = session.vexxed["homeShell"].host_computer
+c = session.vexxed["homeShell"].host_computer
 
-    if not c.File(current_path + "/payloads.db") then
-        self.scanResult = {}
-    else
-		database_file = c.File(current_path + "/payloads.db")
+if not c.File("/root/payloads.db") then
+	self.scanResult = {}
+else
+	content = c.File("/root/payloads.db").get_content
 
-		entries = database_file.get_content.split("#")
-		entries.pop
+	if content.len == 0 then
+		self.scanResult = {}
+	else
+		lines = content.split(char(10))
 
-		for entry in entries
-			entry = entry.split(":")
-			memory_entries = entry[1].split("\.")
-			memory_entries.pop
+		for line in lines
+			if line.len == 0 then continue
 
-			self.scanResult[entry[0]] = {}
+			parts = line.split("\|")
+			lib_id = parts[0]
+			memory_values_pairs = parts[1:]
 
-			for memory_entry in memory_entries
-				memory_entry = memory_entry.split(";")
-				self.scanResult[entry[0]][memory_entry[0]] = memory_entry[1].split(",")
+			self.scanResult[lib_id] = {}
+
+			for pair in memory_values_pairs
+				memory_values = pair.split(":")
+				memory = memory_values[0]
+				values = memory_values[1].split(",")
+				self.scanResult[lib_id][memory] = values
 			end for
 		end for
 	end if
+end if
 end function
 
 Exploiter.resultObjects = {}

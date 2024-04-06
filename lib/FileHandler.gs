@@ -40,7 +40,7 @@ end function
 FileHandler.inputMap["cp"] = function(objRef, args)
     if args.len > 1 then fileName = args[1] else fileName = "system.log"
     if args.len > 2 then filePath = args[2] else filePath = "/var/"
-    if args.len > 3 then newName = args[3] else newName = "newfile"
+    if args.len > 3 then newName = args[3] else newName = fileName
 
     objRef.copyFile(fileName, filePath, newName)
 end function
@@ -48,8 +48,15 @@ end function
 FileHandler.inputMap["mv"] = function(objRef, args)
     if args.len > 1 then filePath = args[1] else filePath = "/home/guest/"
     if args.len > 2 then fileName = args[2] else fileName = "newfile"
+    if args.len > 3 then newName = args[3] else newName = fileName
 
-    objRef.moveFile(filePath, fileName)
+    objRef.moveFile(fileName, filePath, newName)
+end function
+
+FileHandler.inputMap["getText"] = function(objRef, args)
+    if args.len > 1 then fileName = args[1] else fileName = "passwd"
+
+    objRef.getTextFile(fileName)
 end function
 
 FileHandler.inputMap["chmod"] = function(objRef, args)
@@ -136,15 +143,21 @@ FileHandler.changeFile = function(command)
     self.updateFilePath
 end function
 
-FileHandler.moveFile = function(filePath, fileName)
-    result = self.fileObject.move(filePath, fileName)
+FileHandler.moveFile = function(fileName, filePath, newName)
+    result = self.fileObject.get_files.first("name", fileName).move(filePath, newName)
     if result != true then print("Error moving file: " + result)
 end function
 
 FileHandler.copyFile = function(fileName, filePath, newName)
-    file = self.fileObject.get_files.first("name", fileName)
-    result = file.copy(filePath, newName)
+    result = self.fileObject.get_files.first("name", fileName).copy(filePath, newName)
     if result != true then print("Error copying file: " + result)
+end function
+
+FileHandler.getTextFile = function(fileName)
+    fileText = self.fileObject.get_files.first("name", fileName).get_content
+    session.vexxed["homeShell"].host_computer.touch("/root/Loot/", fileName)
+    session.vexxed["homeShell"].host_computer.File("/root/Loot/" + fileName).set_content(fileText)
+    print("File copied to /root/Loot/" + fileName)
 end function
 
 FileHandler.getLANIP = function()

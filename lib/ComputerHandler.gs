@@ -98,7 +98,7 @@ end function
 
 ComputerHandler.createFolder = function(path, folder)
     result = self.computerObject.create_folder(path, folder)
-    if result != trie then
+    if result != true then
         print("Error creating folder: " + result)
     end if
 end function

@@ -260,7 +260,7 @@ end function
 FileHandler.inputMap["cp"] = function(objRef, args)
     if args.len > 1 then fileName = args[1] else fileName = "system.log"
     if args.len > 2 then filePath = args[2] else filePath = "/var/"
-    if args.len > 3 then newName = args[3] else newName = "newfile"
+    if args.len > 3 then newName = args[3] else newName = fileName
 
     objRef.copyFile(fileName, filePath, newName)
 end function
@@ -268,8 +268,15 @@ end function
 FileHandler.inputMap["mv"] = function(objRef, args)
     if args.len > 1 then filePath = args[1] else filePath = "/home/guest/"
     if args.len > 2 then fileName = args[2] else fileName = "newfile"
+    if args.len > 3 then newName = args[3] else newName = fileName
 
-    objRef.moveFile(filePath, fileName)
+    objRef.moveFile(fileName, filePath, newName)
+end function
+
+FileHandler.inputMap["getText"] = function(objRef, args)
+    if args.len > 1 then fileName = args[1] else fileName = "passwd"
+
+    objRef.getTextFile(fileName)
 end function
 
 FileHandler.inputMap["chmod"] = function(objRef, args)
@@ -356,15 +363,21 @@ FileHandler.changeFile = function(command)
     self.updateFilePath
 end function
 
-FileHandler.moveFile = function(filePath, fileName)
-    result = self.fileObject.move(filePath, fileName)
+FileHandler.moveFile = function(fileName, filePath, newName)
+    result = self.fileObject.get_files.first("name", fileName).move(filePath, newName)
     if result != true then print("Error moving file: " + result)
 end function
 
 FileHandler.copyFile = function(fileName, filePath, newName)
-    file = self.fileObject.get_files.first("name", fileName)
-    result = file.copy(filePath, newName)
+    result = self.fileObject.get_files.first("name", fileName).copy(filePath, newName)
     if result != true then print("Error copying file: " + result)
+end function
+
+FileHandler.getTextFile = function(fileName)
+    fileText = self.fileObject.get_files.first("name", fileName).get_content
+    session.vexxed["homeShell"].host_computer.touch("/root/Loot/", fileName)
+    session.vexxed["homeShell"].host_computer.File("/root/Loot/" + fileName).set_content(fileText)
+    print("File copied to /root/Loot/" + fileName)
 end function
 
 FileHandler.getLANIP = function()
@@ -418,7 +431,7 @@ FileHandler.logWipe = function()
     self.changeFile("etc")
     self.writeFile("fstab", "rosebud")
     self.copyFile("fstab", "/var/", "system.log")
-	self.writeFile("fstab", "")
+    self.writeFile("fstab", "")
     print("Logs wiped.")
 end function
 
@@ -532,7 +545,7 @@ end function
 
 ComputerHandler.createFolder = function(path, folder)
     result = self.computerObject.create_folder(path, folder)
-    if result != trie then
+    if result != true then
         print("Error creating folder: " + result)
     end if
 end function
@@ -822,7 +835,6 @@ Exploiter.saveResult = function()
         result_string = result_string + memory_values.join("|") + char(10)
     end for
 
-    print(result_string)
     database_file.set_content(result_string)
 end function
 
@@ -841,7 +853,7 @@ else
 		lines = content.split(char(10))
 
 		for line in lines
-			if line.len == 0 then continue
+			if line.trim.len == 0 then continue
 
 			parts = line.split("\|")
 			lib_id = parts[0]
@@ -933,7 +945,7 @@ RevShellServer.inputMap["use"] = function(objRef, input)
 
     shell = new ShellHandler
     objRef.setActiveClient(input[1].to_int, shell)
-    if shell.getObject then SessionManager.addHandler(shell)
+    if shell.getObject then session.vexxed["session"].addHandler(shell)
 end function
 
 RevShellServer.getClients = function(metaxLib)

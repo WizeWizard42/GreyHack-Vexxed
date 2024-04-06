@@ -23,7 +23,7 @@ RevShellServer.inputMap["use"] = function(objRef, input)
 
     shell = new ShellHandler
     objRef.setActiveClient(input[1].to_int, shell)
-    if shell.getObject then SessionManager.addHandler(shell)
+    if shell.getObject then session.vexxed["session"].addHandler(shell)
 end function
 
 RevShellServer.getClients = function(metaxLib)

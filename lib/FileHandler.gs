@@ -60,10 +60,11 @@ FileHandler.inputMap["getText"] = function(objRef, args)
 end function
 
 FileHandler.inputMap["chmod"] = function(objRef, args)
-    if args.len > 1 then newPerms = args[1] else newPerms = "o+rwx"
-    if args.len > 2 then recursive = args[2].to_int else recursive = 0
+    if args.len > 1 then fileName = args[1] else fileName = "."
+    if args.len > 2 then newPerms = args[1] else newPerms = "777"
+    if args.len > 3 then recursive = args[2].to_int else recursive = 0
 
-    objRef.changePerms(newPerms, recursive)
+    objRef.changePerms(fileName, newPerms, recursive)
 end function
 
 FileHandler.inputMap["write"] = function(objRef, args)
@@ -192,14 +193,45 @@ FileHandler.toRoot = function()
     end while
 end function
 
-FileHandler.changePerms = function(newPerms, recursive = 0)
-    result = self.fileObject.chmod(newPerms, recursive)
-
-    if result == "" then
+FileHandler.changePerms = function(fileName, newPerms, recursive = 0)
+    if fileName != "." then file = self.fileObject.get_files.first("name", fileName) else file = self.fileObject
+    
+    // First, change all permissions to 000.
+    result = file.chmod("u-rwx", recursive)
+    if result.len == 0 then
         print("Error changing permissions: " + result)
-    else
-        print("Success.")
+        return
     end if
+    file.chmod("g-rwx", recursive)
+    file.chmod("o-rwx", recursive)
+
+    // Then, convert octal to rwx.
+    userOctal = newPerms[0].to_int
+    groupOctal = newPerms[1].to_int
+    otherOctal = newPerms[2].to_int
+
+    // Ternary operators don't exist in this language, so we have to do it the long way.
+    userPerms = "u+"
+    if userOctal & 4 then userPerms += "r"
+    if userOctal & 2 then userPerms += "w"
+    if userOctal & 1 then userPerms += "x"
+
+    groupPerms = "g+"
+    if groupOctal & 4 then groupPerms += "r"
+    if groupOctal & 2 then groupPerms += "w"
+    if groupOctal & 1 then groupPerms += "x"
+
+    otherPerms = "o+"
+    if otherOctal & 4 then otherPerms += "r"
+    if otherOctal & 2 then otherPerms += "w"
+    if otherOctal & 1 then otherPerms += "x"
+
+    // Finally, apply the new permissions.
+    file.chmod(userPerms, recursive)
+    file.chmod(groupPerms, recursive)
+    file.chmod(otherPerms, recursive)
+
+    print("Permissions changed.")
 end function
 
 FileHandler.logWipe = function()

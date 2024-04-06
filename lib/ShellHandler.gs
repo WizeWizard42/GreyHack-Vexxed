@@ -122,6 +122,6 @@ ShellHandler.connectService = function(ip, port, username, userPass)
     if typeof(result) == "shell" then
         shell = new ShellHandler
         shell.updateShellObject(result)
-        SessionManager.addHandler(shell)
+        session.vexxed["session"].addHandler(shell)
     end if
 end function

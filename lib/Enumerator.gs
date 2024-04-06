@@ -7,6 +7,8 @@ Enumerator.fullEnumerate = function(ip)
     
     router = get_router(ip)
     print("\nRouter LAN address: " + router.local_ip)
+    print("Router BSSID: " + router.bssid_name)
+    print("Router ESSID: " + router.essid_name)
     print("\nPort-forwards detected: ")
     for port in router.used_ports
         print(port.port_number + "  open:" + (not port.is_closed) + "  " + router.port_info(port) + "  " + port.get_lan_ip)

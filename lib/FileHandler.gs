@@ -212,19 +212,19 @@ FileHandler.changePerms = function(fileName, newPerms, recursive = 0)
 
     // Ternary operators don't exist in this language, so we have to do it the long way.
     userPerms = "u+"
-    if userOctal & 4 then userPerms += "r"
-    if userOctal & 2 then userPerms += "w"
-    if userOctal & 1 then userPerms += "x"
+    if bitAnd(userOctal, 4) then userPerms = userPerms + "r"
+    if bitAnd(userOctal, 2) then userPerms = userPerms + "w"
+    if bitAnd(userOctal, 1) then userPerms = userPerms + "x"
 
     groupPerms = "g+"
-    if groupOctal & 4 then groupPerms += "r"
-    if groupOctal & 2 then groupPerms += "w"
-    if groupOctal & 1 then groupPerms += "x"
+    if bitAnd(groupOctal, 4) then groupPerms = groupPerms + "r"
+    if bitAnd(groupOctal, 2) then groupPerms = groupPerms + "w"
+    if bitAnd(groupOctal, 1) then groupPerms = groupPerms + "x"
 
     otherPerms = "o+"
-    if otherOctal & 4 then otherPerms += "r"
-    if otherOctal & 2 then otherPerms += "w"
-    if otherOctal & 1 then otherPerms += "x"
+    if bitAnd(otherOctal, 4) then otherPerms = otherPerms + "r"
+    if bitAnd(otherOctal, 2) then otherPerms = otherPerms + "w"
+    if bitAnd(otherOctal, 1) then otherPerms = otherPerms + "x"
 
     // Finally, apply the new permissions.
     file.chmod(userPerms, recursive)

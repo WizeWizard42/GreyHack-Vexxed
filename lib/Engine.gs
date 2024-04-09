@@ -103,6 +103,7 @@ Engine.handleInput = function(input)
 		end if
 		
         session.vexxed["session"].handleInput(command)
-        session.vexxed["session"].currHandler.handleInput(command)
+        result = session.vexxed["session"].currHandler.handleInput(command)
+        if result isa GenericError then print(error.toString) else print(result)
     end for
 end function

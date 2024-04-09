@@ -115,3 +115,33 @@ FileChmodError.create = function(fileName = "", permissions = "", reason = "")
     error.reason = reason
     return error
 end function
+
+FileChgrpError = new GenericFileError
+FileChgrpError.classID = "FileChgrpError"
+FileChgrpError.message = "Error changing file group."
+FileChgrpError.fileName = ""
+FileChgrpError.group = ""
+FileChgrpError.reason = ""
+FileChgrpError.create = function(fileName = "", group = "", reason = "")
+    error = new FileChgrpError
+    error.message = "Error changing file group for " + fileName + " to " + group + ": " + reason
+    error.fileName = fileName
+    error.group = group
+    error.reason = reason
+    return error
+end function
+
+FileChownError = new GenericFileError
+FileChownError.classID = "FileChownError"
+FileChownError.message = "Error changing file owner."
+FileChownError.fileName = ""
+FileChownError.owner = ""
+FileChownError.reason = ""
+FileChownError.create = function(fileName = "", owner = "", reason = "")
+    error = new FileChownError
+    error.message = "Error changing file owner for " + fileName + " to " + owner + ": " + reason
+    error.fileName = fileName
+    error.owner = owner
+    error.reason = reason
+    return error
+end function

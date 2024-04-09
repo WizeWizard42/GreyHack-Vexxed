@@ -255,6 +255,36 @@ FileChmodError.create = function(fileName = "", permissions = "", reason = "")
     return error
 end function
 
+FileChgrpError = new GenericFileError
+FileChgrpError.classID = "FileChgrpError"
+FileChgrpError.message = "Error changing file group."
+FileChgrpError.fileName = ""
+FileChgrpError.group = ""
+FileChgrpError.reason = ""
+FileChgrpError.create = function(fileName = "", group = "", reason = "")
+    error = new FileChgrpError
+    error.message = "Error changing file group for " + fileName + " to " + group + ": " + reason
+    error.fileName = fileName
+    error.group = group
+    error.reason = reason
+    return error
+end function
+
+FileChownError = new GenericFileError
+FileChownError.classID = "FileChownError"
+FileChownError.message = "Error changing file owner."
+FileChownError.fileName = ""
+FileChownError.owner = ""
+FileChownError.reason = ""
+FileChownError.create = function(fileName = "", owner = "", reason = "")
+    error = new FileChownError
+    error.message = "Error changing file owner for " + fileName + " to " + owner + ": " + reason
+    error.fileName = fileName
+    error.owner = owner
+    error.reason = reason
+    return error
+end function
+
 ////////////////////////////////////////////////////////////////////////////////////
 
 // File: ComputerError.gs
@@ -511,6 +541,22 @@ FileHandler.inputMap["chmod"] = function(objRef, args)
     return objRef.changePerms(fileName, newPerms, recursive)
 end function
 
+FileHandler.inputMap["chgrp"] = function(objRef, args)
+    if args.len > 1 then fileName = args[1] else fileName = "."
+    if args.len > 2 then newGroup = args[2] else newGroup = "guest"
+    if args.len > 3 then recursive = args[3].to_int else recursive = 0
+
+    return objRef.changeGroup(fileName, newGroup, recursive)
+end function
+
+FileHandler.inputMap["chown"] = function(objRef, args)
+    if args.len > 1 then fileName = args[1] else fileName = "."
+    if args.len > 2 then newOwner = args[2] else newOwner = "guest"
+    if args.len > 3 then recursive = args[3].to_int else recursive = 0
+
+    return objRef.changeOwner(fileName, newOwner, recursive)
+end function
+
 FileHandler.inputMap["write"] = function(objRef, args)
     if args.len > 1 then fileName = args[1] else fileName = "fstab"
     if args.len > 2 then content = args[2] else content = "rosebud"
@@ -544,28 +590,25 @@ end function
 // Prints out files and folders in File object's directory.
 FileHandler.getFiles = function()
     result = ""
+    result = result + "Permissions Owner Group Size Name\n"
+    result = result + self.fileObject.permissions + " " + self.fileObject.owner + " " + self.fileObject.group + " " + self.fileObject.size + " .\n"
     for file in self.fileObject.get_files
-        result = result + file.permissions + " " + file.group + " " + file.owner + " " + file.size + " " + file.name + "\n"
+        result = result + file.permissions + " " + file.owner + " " + file.group + " " + file.size + " " + file.name + "\n"
     end for
     
     for folder in self.fileObject.get_folders
-        result = result + folder.permissions + " " + folder.group + " " + folder.owner + " " + folder.size + " " + folder.name + "\n"
+        result = result + folder.permissions + " " + folder.owner + " " + folder.group + " " + folder.size + " " + folder.name + "\n"
     end for
 
-    return result
+    return format_columns(result)
 end function
 
 FileHandler.checkFile = function(fileName)
-    if self.fileObject.get_files.first("name", fileName) then
-        return true
-    end if
-    return false
-end function
-
-FileHandler.checkFolder = function(folderName)
-    if self.fileObject.get_folders.first("name", folderName) then
-        return true
-    end if
+    if fileName == "." then return self.fileObject
+    file = self.fileObject.get_files.first("name", fileName)
+    folder = self.fileObject.get_folders.first("name", fileName)
+    if file then return file
+    if folder then return folder
     return false
 end function
 
@@ -584,14 +627,15 @@ end function
 
 // Deletes the file if it exists.
 FileHandler.deleteFile = function(fileName)
-    if not self.checkFile(fileName) then return FileNotFoundError.create(fileName)
-    result = self.fileObject.get_files.first("name", fileName).delete
+    file = self.checkFile(fileName)
+    if not file then return FileNotFoundError.create(fileName)
+    result = file.delete
     if result.trim.len != 0 then return FileDeleteError.create(fileName, result) else return "File deleted."
 end function
 
 // Changes directory appropriately. Does not support absolute paths.
 FileHandler.changeFile = function(command)
-    changeQueue = command.split("/")
+    changeQueue = command.split("\/")
     for each in changeQueue
         if each.trim.len == 0 then continue
         if command == ".." then
@@ -602,7 +646,7 @@ FileHandler.changeFile = function(command)
                 return GenericError.create("Cannot go up. If you aren't in /, cwd may have been deleted.")
             end if
         else
-            if not self.checkFolder(command) then return FileNotFoundError.create(command)
+            if not self.checkFile(command) then return FileNotFoundError.create(command)
             self.fileObject = self.fileObject.get_folders.first("name", command)
         end if
     end for
@@ -611,14 +655,16 @@ FileHandler.changeFile = function(command)
 end function
 
 FileHandler.moveFile = function(fileName, filePath, newName)
-    if not self.checkFile(fileName) then return FileNotFoundError.create(fileName)
-    result = self.fileObject.get_files.first("name", fileName).move(filePath, newName)
+    file = self.checkFile(fileName)
+    if not file then return FileNotFoundError.create(fileName)
+    result = file.move(filePath, newName)
     if result != true then return FileMoveError.create(fileName, filePath, result) else return "File moved."
 end function
 
 FileHandler.copyFile = function(fileName, filePath, newName)
-    if not self.checkFile(fileName) then return FileNotFoundError.create(fileName)
-    result = self.fileObject.get_files.first("name", fileName).copy(filePath, newName)
+    file = self.checkFile(fileName)
+    if not file then return FileNotFoundError.create(fileName)
+    result = file.copy(filePath, newName)
     if result != true then return FileCopyError.create(fileName, filePath, result) else return "File copied."
 end function
 
@@ -664,7 +710,7 @@ FileHandler.toRoot = function()
 end function
 
 FileHandler.changePerms = function(fileName, newPerms, recursive = 0)
-    if fileName != "." then file = self.fileObject.get_files.first("name", fileName) else file = self.fileObject
+    if fileName == "." then file = self.fileObject else file = self.checkFile(fileName)
 
     if not file then return FileNotFoundError.create(fileName)
     
@@ -703,6 +749,22 @@ FileHandler.changePerms = function(fileName, newPerms, recursive = 0)
     return "Permissions changed."
 end function
 
+FileHandler.changeGroup = function(fileName, newGroup, recursive = 0)
+    if fileName != "." then file = self.fileObject.get_files.first("name", fileName) else file = self.fileObject
+
+    if not file then return FileNotFoundError.create(fileName)
+    result = file.set_group(newGroup, recursive)
+    if result.trim.len != 0 then return FileChgrpError.create(fileName, newGroup, result) else return "Group changed."
+end function
+
+FileHandler.changeOwner = function(fileName, newOwner, recursive = 0)
+    if fileName != "." then file = self.fileObject.get_files.first("name", fileName) else file = self.fileObject
+
+    if not file then return FileNotFoundError.create(fileName)
+    result = file.set_owner(newOwner, recursive)
+    if result.trim.len != 0 then return FileChownError.create(fileName, newOwner, result) else return "Owner changed."
+end function
+
 FileHandler.logWipe = function()
     if self.getPerms != "root" then return "Root permissions required."
     result = self.toRoot
@@ -713,7 +775,7 @@ FileHandler.logWipe = function()
     if result isa GenericError then return result
     result = self.copyFile("fstab", "/var/", "system.log")
     if result isa GenericError then return result
-    self.writeFile("fstab", "")
+    self.writeFile("fstab", "") 
     return "Logs wiped."
 end function
 
@@ -879,7 +941,7 @@ end function
 ShellHandler.inputMap["build"] = function(objRef, args)
     if args.len > 1 then srcPath = args[1] else srcPath = "/home/guest/dddd.src"
     if args.len > 2 then binPath = args[2] else binPath = "/home/guest"
-    if args.len > 3 then canImport = args[3] else canImport = 0
+    if args.len > 3 then canImport = args[3].to_int else canImport = 0
 
     objRef.buildFile(srcPath, binPath, canImport)
 end function
@@ -1363,7 +1425,11 @@ Engine.handleInput = function(input)
 		
         session.vexxed["session"].handleInput(command)
         result = session.vexxed["session"].currHandler.handleInput(command)
-        if result isa GenericError then print(result.toString) else print(result)
+        if typeof(result) == "string" then
+            print(result)
+        else if result != null then
+            print(result.toString)
+        end if
     end for
 end function
 

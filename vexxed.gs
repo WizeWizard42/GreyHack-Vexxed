@@ -714,7 +714,8 @@ end function
 FileHandler.handleInput = function(input)
     if input.len == 0 or not self.inputMap.hasIndex(input[0]) then return
     
-    self.inputMap[input[0]](self, input)
+    func = @self.inputMap[input[0]]
+    return func(self, input)
 end function
 
 ////////////////////////////////////////////////////////////////////////////////////

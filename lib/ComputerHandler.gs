@@ -10,44 +10,44 @@ ComputerHandler.classID = "ComputerHandler"
 ComputerHandler.displayID = "Computer"
 
 ComputerHandler.inputMap["ps"] = function(objRef, args)
-    print(objRef.getProcesses)
+    return objRef.getProcesses
 end function
 
 ComputerHandler.inputMap["kill"] = function(objRef, args)
-    if args.len > 1 then pid = args[1] else pid = "0"
+    if args.len > 1 then pid = args[1] else pid = 0
 
-    objRef.closeProcess(pid.to_int)
+    return objRef.closeProcess(pid.to_int)
 end function
 
 ComputerHandler.inputMap["useradd"] = function(objRef, args)
     if args.len > 1 then username = args[1] else username = "user"
 
-    objRef.userAdd(username, "secretpassword")
+    return objRef.userAdd(username, "secretpassword")
 end function
 
 ComputerHandler.inputMap["passwd"] = function(objRef, args)
     if args.len > 1 then username = args[1] else username = "user"
     if args.len > 2 then pass = args[2] else pass = "secretpasswd"
 
-    objRef.changePass(username, pass)
+    return objRef.changePass(username, pass)
 end function
 
 ComputerHandler.inputMap["touch"] = function(objRef, args)
     if args.len > 1 then fileName = args[1] else fileName = "file.txt"
 
-    objRef.createFile(objRef.fileObject.path, fileName)
+    return objRef.createFile(objRef.fileObject.path, fileName)
 end function
 
 ComputerHandler.inputMap["mkdir"] = function(objRef, args)
     if args.len > 1 then folder = args[1] else folder = "dir"
 
-    objRef.createFolder(objRef.fileObject.path, folder)
+    return objRef.createFolder(objRef.fileObject.path, folder)
 end function
 
 ComputerHandler.inputMap["iwlist"] = function(objRef, args)
     if args.len > 1 then interface = args[1] else interface = "wlan0"
 
-    objRef.getWiFiObjects(interface)
+    return objRef.getWiFiObjects(interface)
 end function
 
 ComputerHandler.getObject = function()
@@ -68,53 +68,48 @@ end function
 // Kills process by pid.
 ComputerHandler.closeProcess = function(pid)
     result = self.computerObject.close_program(pid)
-    if result != true then
-        print("Error killing process: " + result)
-    end if
+    if result != true then return ComputerProcError.create(pid, result)
 end function
 
 // Adds a user, using stored Computer.
 ComputerHandler.userAdd = function(username, password)
     result = self.computerObject.create_user(username, password)
-    if result != true then
-        print("Error adding user: " + result)
-    end if
+    if result != true then return ComputerUserAddError.create(username, password, result)
 end function
 
 ComputerHandler.changePass = function(username, password)
     result = self.computerObject.change_password(username, password)
-    if result != true then
-        print("Error changing password: " + result)
-    end if
+    if result != true then return ComputerChPassError.create(username, password, result)
 end function
 
 // Creates a file, like "touch".
 ComputerHandler.createFile = function(path, fileName)
     result = self.computerObject.touch(path, fileName)
-    if result != true then
-        print("Error creating file: " + result)
-    end if
+    if result != true then return ComputerTouchError.create(path, fileName, result)
 end function
 
 ComputerHandler.createFolder = function(path, folder)
     result = self.computerObject.create_folder(path, folder)
-    if result != true then
-        print("Error creating folder: " + result)
-    end if
+    if result != true then return ComputerMkdirError.create(path, folder, result)
+end function
+
+ComputerHandler.getActiveCard = function()
+    return self.computerObject.active_net_card
+end function
+
+ComputerHandler.getInterfaces = function()
+    return format_columns(self.computerObject.network_devices)
 end function
 
 ComputerHandler.getWiFiObjects = function(interface)
     networks = self.computerObject.wifi_networks(interface)
-    if networks == null then
-        print("Interface does not exist.")
-        return
-    end if
+    if networks == null then return ComputerInvalidInterfaceError.create(interface)
 
     info = "BSSID PWR ESSID"
     for network in networks
         info = info + "\n" + network
     end for
-    print(format_columns(info))
+    return format_columns(info)
 end function
 
 ComputerHandler.getLANIP = function()

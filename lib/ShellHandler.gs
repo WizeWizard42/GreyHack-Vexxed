@@ -41,8 +41,8 @@ ShellHandler.inputMap["launch"] = function(objRef, args)
 end function
 
 ShellHandler.inputMap["sudo"] = function(objRef, args)
-    if args.len > 1 then userName = args[1] else userName = "root"
-    if args.len > 2 then userPass = args[2] else userPass = "root"
+    if args.len > 1 then userName = args[1] else userName = ""
+    if args.len > 2 then userPass = args[2] else userPass = ""
 
     objRef.trySudo(userName, userPass)
 end function
@@ -89,7 +89,8 @@ ShellHandler.putFile = function(filePath)
 end function
 
 ShellHandler.trySudo = function(userName, userPass)
-    result = get_shell(userName, userPass)
+
+    if userName.trim.len == 0 and userPass.trim.len == 0 then result = get_shell else result = get_shell(userName, userPass)
     if not result then
         print("User/pass combo incorrect. Remember, this only works on the current remoteShell.")
         return

@@ -136,7 +136,7 @@ end function
 
 ////////////////////////////////////////////////////////////////////////////////////
 
-// File: Error.gs
+// File: FileError.gs
 // Error class. Provides a way to handle errors in a more structured way.
 GenericError = {}
 
@@ -151,7 +151,18 @@ GenericError.toString = function()
     return self.message
 end function
 
-FileNotFoundError = new GenericError
+GenericFileError = new GenericError
+GenericFileError.classID = "GenericFileError"
+GenericFileError.message = "An error occurred with a file."
+GenericFileError.fileName = ""
+GenericFileError.create = function(fileName = "")
+    error = new GenericFileError
+    error.message = "An error occurred with file: " + fileName
+    error.fileName = fileName
+    return error
+end function
+
+FileNotFoundError = new GenericFileError
 FileNotFoundError.classID = "FileNotFoundError"
 FileNotFoundError.message = "File or directory not found."
 FileNotFoundError.fileName = ""
@@ -162,7 +173,7 @@ FileNotFoundError.create = function(fileName = "")
     return error
 end function
 
-FileReadError = new GenericError
+FileReadError = new GenericFileError
 FileReadError.classID = "FileReadError"
 FileReadError.message = "Error reading file."
 FileReadError.fileName = ""
@@ -173,33 +184,33 @@ FileReadError.create = function(fileName = "")
     return error
 end function
 
-FileWriteError = new GenericError
+FileWriteError = new GenericFileError
 FileWriteError.classID = "FileWriteError"
 FileWriteError.message = "Error writing file."
 FileWriteError.fileName = ""
 FileWriteError.reason = ""
 FileWriteError.create = function(fileName = "", reason = "")
     error = new FileWriteError
-    error.message = "Error writing file: " + fileName
+    error.message = "Error writing file " + fileName + ": " + reason
     error.fileName = fileName
     error.reason = reason
     return error
 end function
 
-FileDeleteError = new GenericError
+FileDeleteError = new GenericFileError
 FileDeleteError.classID = "FileDeleteError"
 FileDeleteError.message = "Error deleting file."
 FileDeleteError.fileName = ""
 FileDeleteError.reason = ""
 FileDeleteError.create = function(fileName = "", reason = "")
     error = new FileDeleteError
-    error.message = "Error deleting file: " + fileName
+    error.message = "Error deleting file " + fileName + ": " + reason
     error.fileName = fileName
     error.reason = reason
     return error
 end function
 
-FileCopyError = new GenericError
+FileCopyError = new GenericFileError
 FileCopyError.classID = "FileCopyError"
 FileCopyError.message = "Error copying file."
 FileCopyError.fileName = ""
@@ -207,14 +218,14 @@ FileCopyError.destination = ""
 FileCopyError.reason = ""
 FileCopyError.create = function(fileName = "", destination = "", reason = "")
     error = new FileCopyError
-    error.message = "Error copying file: " + fileName
+    error.message = "Error copying file " + fileName + " to " + destination + ": " + reason
     error.fileName = fileName
     error.destination = destination
     error.reason = reason
     return error
 end function
 
-FileMoveError = new GenericError
+FileMoveError = new GenericFileError
 FileMoveError.classID = "FileMoveError"
 FileMoveError.message = "Error moving file."
 FileMoveError.fileName = ""
@@ -222,14 +233,14 @@ FileMoveError.destination = ""
 FileMoveError.reason = ""
 FileMoveError.create = function(fileName = "", destination = "", reason = "")
     error = new FileMoveError
-    error.message = "Error moving file: " + fileName
+    error.message = "Error moving file " + fileName + " to " + destination + ": " + reason
     error.fileName = fileName
     error.destination = destination
     error.reason = reason
     return error
 end function
 
-FileChmodError = new GenericError
+FileChmodError = new GenericFileError
 FileChmodError.classID = "FileChmodError"
 FileChmodError.message = "Error changing file permissions."
 FileChmodError.fileName = ""
@@ -237,10 +248,113 @@ FileChmodError.permissions = ""
 FileChmodError.reason = ""
 FileChmodError.create = function(fileName = "", permissions = "", reason = "")
     error = new FileChmodError
-    error.message = "Error changing file permissions: " + fileName
+    error.message = "Error changing file permissions for " + fileName + " to " + permissions + ": " + reason
     error.fileName = fileName
     error.permissions = permissions
     error.reason = reason
+    return error
+end function
+
+////////////////////////////////////////////////////////////////////////////////////
+
+// File: ComputerError.gs
+GenericComputerError = new GenericError
+GenericComputerError.classID = "GenericComputerError"
+GenericComputerError.message = "An error with a computer object has occurred."
+GenericComputerError.create = function()
+    return new GenericComputerError
+end function
+
+ComputerProcError = new GenericComputerError
+ComputerProcError.classID = "ComputerProcError"
+ComputerProcError.message = "Error killing a process."
+ComputerProcError.pid = 0
+ComputerProcError.reason = ""
+ComputerProcError.create = function(pid = 0, reason = "")
+    error = new ComputerProcError
+    error.message = "Error killing process: " + pid + ": " + reason
+    error.pid = pid
+    error.reason = reason
+    return error
+end function
+
+ComputerUserAddError = new GenericComputerError
+ComputerUserAddError.classID = "ComputerUserAddError"
+ComputerUserAddError.message = "Error adding a user."
+ComputerUserAddError.username = ""
+ComputerUserAddError.password = ""
+ComputerUserAddError.reason = ""
+ComputerUserAddError.create = function(username = "", password = "", reason = "")
+    error = new ComputerUserAddError
+    error.message = "Error adding user " + username + " with password " + password + ": " + reason
+    error.username = username
+    error.password = password
+    error.reason = reason
+    return error
+end function
+
+ComputerUserRemoveError = new GenericComputerError
+ComputerUserRemoveError.classID = "ComputerUserRemoveError"
+ComputerUserRemoveError.message = "Error removing a user."
+ComputerUserRemoveError.username = ""
+ComputerUserRemoveError.reason = ""
+ComputerUserRemoveError.create = function(username = "", reason = "")
+    error = new ComputerUserRemoveError
+    error.message = "Error removing user " + username + ": " + reason
+    error.username = username
+    error.reason = reason
+    return error
+end function
+
+ComputerUserChPassError = new GenericComputerError
+ComputerUserChPassError.classID = "ComputerUserChPassError"
+ComputerUserChPassError.message = "Error changing a user's password."
+ComputerUserChPassError.username = ""
+ComputerUserChPassError.password = ""
+ComputerUserChPassError.reason = ""
+ComputerUserChPassError.create = function(username = "", password = "", reason = "")
+    error = new ComputerUserChPassError
+    error.message = "Error changing password for user " + username + " to " + password + ": " + reason
+    error.username = username
+    error.password = password
+    error.reason = reason
+    return error
+end function
+
+ComputerTouchError = new GenericComputerError
+ComputerTouchError.classID = "ComputerTouchError"
+ComputerTouchError.message = "Error touching a file."
+ComputerTouchError.filename = ""
+ComputerTouchError.reason = ""
+ComputerTouchError.create = function(filename = "", reason = "")
+    error = new ComputerTouchError
+    error.message = "Error touching file " + filename + ": " + reason
+    error.filename = filename
+    error.reason = reason
+    return error
+end function
+
+ComputerMkdirError = new GenericComputerError
+ComputerMkdirError.classID = "ComputerMkdirError"
+ComputerMkdirError.message = "Error creating a directory."
+ComputerMkdirError.directory = ""
+ComputerMkdirError.reason = ""
+ComputerMkdirError.create = function(directory = "", reason = "")
+    error = new ComputerMkdirError
+    error.message = "Error creating directory " + directory + ": " + reason
+    error.directory = directory
+    error.reason = reason
+    return error
+end function
+
+ComputerInvalidInterfaceError = new GenericComputerError
+ComputerInvalidInterfaceError.classID = "ComputerInvalidInterfaceError"
+ComputerInvalidInterfaceError.message = "Invalid interface."
+ComputerInvalidInterfaceError.interface = ""
+ComputerInvalidInterfaceError.create = function(interface = "")
+    error = new ComputerInvalidInterfaceError
+    error.message = "Invalid interface: " + interface
+    error.interface = interface
     return error
 end function
 
@@ -616,44 +730,44 @@ ComputerHandler.classID = "ComputerHandler"
 ComputerHandler.displayID = "Computer"
 
 ComputerHandler.inputMap["ps"] = function(objRef, args)
-    print(objRef.getProcesses)
+    return objRef.getProcesses
 end function
 
 ComputerHandler.inputMap["kill"] = function(objRef, args)
-    if args.len > 1 then pid = args[1] else pid = "0"
+    if args.len > 1 then pid = args[1] else pid = 0
 
-    objRef.closeProcess(pid.to_int)
+    return objRef.closeProcess(pid.to_int)
 end function
 
 ComputerHandler.inputMap["useradd"] = function(objRef, args)
     if args.len > 1 then username = args[1] else username = "user"
 
-    objRef.userAdd(username, "secretpassword")
+    return objRef.userAdd(username, "secretpassword")
 end function
 
 ComputerHandler.inputMap["passwd"] = function(objRef, args)
     if args.len > 1 then username = args[1] else username = "user"
     if args.len > 2 then pass = args[2] else pass = "secretpasswd"
 
-    objRef.changePass(username, pass)
+    return objRef.changePass(username, pass)
 end function
 
 ComputerHandler.inputMap["touch"] = function(objRef, args)
     if args.len > 1 then fileName = args[1] else fileName = "file.txt"
 
-    objRef.createFile(objRef.fileObject.path, fileName)
+    return objRef.createFile(objRef.fileObject.path, fileName)
 end function
 
 ComputerHandler.inputMap["mkdir"] = function(objRef, args)
     if args.len > 1 then folder = args[1] else folder = "dir"
 
-    objRef.createFolder(objRef.fileObject.path, folder)
+    return objRef.createFolder(objRef.fileObject.path, folder)
 end function
 
 ComputerHandler.inputMap["iwlist"] = function(objRef, args)
     if args.len > 1 then interface = args[1] else interface = "wlan0"
 
-    objRef.getWiFiObjects(interface)
+    return objRef.getWiFiObjects(interface)
 end function
 
 ComputerHandler.getObject = function()
@@ -674,53 +788,48 @@ end function
 // Kills process by pid.
 ComputerHandler.closeProcess = function(pid)
     result = self.computerObject.close_program(pid)
-    if result != true then
-        print("Error killing process: " + result)
-    end if
+    if result != true then return ComputerProcError.create(pid, result)
 end function
 
 // Adds a user, using stored Computer.
 ComputerHandler.userAdd = function(username, password)
     result = self.computerObject.create_user(username, password)
-    if result != true then
-        print("Error adding user: " + result)
-    end if
+    if result != true then return ComputerUserAddError.create(username, password, result)
 end function
 
 ComputerHandler.changePass = function(username, password)
     result = self.computerObject.change_password(username, password)
-    if result != true then
-        print("Error changing password: " + result)
-    end if
+    if result != true then return ComputerChPassError.create(username, password, result)
 end function
 
 // Creates a file, like "touch".
 ComputerHandler.createFile = function(path, fileName)
     result = self.computerObject.touch(path, fileName)
-    if result != true then
-        print("Error creating file: " + result)
-    end if
+    if result != true then return ComputerTouchError.create(path, fileName, result)
 end function
 
 ComputerHandler.createFolder = function(path, folder)
     result = self.computerObject.create_folder(path, folder)
-    if result != true then
-        print("Error creating folder: " + result)
-    end if
+    if result != true then return ComputerMkdirError.create(path, folder, result)
+end function
+
+ComputerHandler.getActiveCard = function()
+    return self.computerObject.active_net_card
+end function
+
+ComputerHandler.getInterfaces = function()
+    return format_columns(self.computerObject.network_devices)
 end function
 
 ComputerHandler.getWiFiObjects = function(interface)
     networks = self.computerObject.wifi_networks(interface)
-    if networks == null then
-        print("Interface does not exist.")
-        return
-    end if
+    if networks == null then return ComputerInvalidInterfaceError.create(interface)
 
     info = "BSSID PWR ESSID"
     for network in networks
         info = info + "\n" + network
     end for
-    print(format_columns(info))
+    return format_columns(info)
 end function
 
 ComputerHandler.getLANIP = function()
@@ -775,8 +884,8 @@ ShellHandler.inputMap["launch"] = function(objRef, args)
 end function
 
 ShellHandler.inputMap["sudo"] = function(objRef, args)
-    if args.len > 1 then userName = args[1] else userName = "root"
-    if args.len > 2 then userPass = args[2] else userPass = "root"
+    if args.len > 1 then userName = args[1] else userName = ""
+    if args.len > 2 then userPass = args[2] else userPass = ""
 
     objRef.trySudo(userName, userPass)
 end function
@@ -823,7 +932,8 @@ ShellHandler.putFile = function(filePath)
 end function
 
 ShellHandler.trySudo = function(userName, userPass)
-    result = get_shell(userName, userPass)
+
+    if userName.trim.len == 0 and userPass.trim.len == 0 then result = get_shell else result = get_shell(userName, userPass)
     if not result then
         print("User/pass combo incorrect. Remember, this only works on the current remoteShell.")
         return
@@ -1244,7 +1354,8 @@ Engine.handleInput = function(input)
 		end if
 		
         session.vexxed["session"].handleInput(command)
-        session.vexxed["session"].currHandler.handleInput(command)
+        result = session.vexxed["session"].currHandler.handleInput(command)
+        if result isa GenericError then print(error.toString) else print(result)
     end for
 end function
 

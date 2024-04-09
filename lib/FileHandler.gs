@@ -269,7 +269,7 @@ end function
 
 // As inputMap is updated in better objects, more commands can be used
 FileHandler.handleInput = function(input)
-    if input.len == 0 or not self.inputMap.hasIndex(input[0]) then return // Invalid input or command
-
-    return self.inputMap[input[0]](self, input)
+    if input.len == 0 or not self.inputMap.hasIndex(input[0]) then return
+    
+    self.inputMap[input[0]](self, input)
 end function

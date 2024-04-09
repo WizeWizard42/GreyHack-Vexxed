@@ -562,6 +562,13 @@ FileHandler.checkFile = function(fileName)
     return false
 end function
 
+FileHandler.checkFolder = function(folderName)
+    if self.fileObject.get_folders.first("name", folderName) then
+        return true
+    end if
+    return false
+end function
+
 // Returns content of specified file. Needs to be in current directory.
 FileHandler.readFile = function(fileName)
     if not self.checkFile(fileName) then return FileNotFoundError.create(fileName)
@@ -595,7 +602,7 @@ FileHandler.changeFile = function(command)
                 return GenericError.create("Cannot go up. If you aren't in /, cwd may have been deleted.")
             end if
         else
-            if not self.checkFile(command) then return FileNotFoundError.create(command)
+            if not self.checkFolder(command) then return FileNotFoundError.create(command)
             self.fileObject = self.fileObject.get_folders.first("name", command)
         end if
     end for

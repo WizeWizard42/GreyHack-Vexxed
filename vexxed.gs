@@ -1,9 +1,9 @@
-metaxploit = include_lib("/lib/metaxploit.so")
-if not metaxploit then metaxploit = include_lib(current_path + "/metaxploit.so")
+metaxploit = include_lib(current_path + "/metaxploit.so")
+if not metaxploit then metaxploit = include_lib("/lib/metaxploit.so")
 if not metaxploit then exit("Could not import metaxploit. Exiting.")
 
-crypto = include_lib("/lib/crypto.so")
-if not crypto then crypto = include_lib(current_path + "/crypto.so")
+crypto = include_lib(current_path + "/crypto.so")
+if not crypto then crypto = include_lib("/lib/crypto.so")
 if not crypto then print("Could not import crypto. Continuing.")
 
 session = @get_custom_object
@@ -712,9 +712,9 @@ end function
 
 // As inputMap is updated in better objects, more commands can be used
 FileHandler.handleInput = function(input)
-    if input.len == 0 or not self.inputMap.hasIndex(input[0]) then return // Invalid input or command
-
-    return self.inputMap[input[0]](self, input)
+    if input.len == 0 or not self.inputMap.hasIndex(input[0]) then return
+    
+    self.inputMap[input[0]](self, input)
 end function
 
 ////////////////////////////////////////////////////////////////////////////////////

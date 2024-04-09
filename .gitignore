@@ -1,3 +1,4 @@
 .vscode/**
 Scratch/**
 node_modules/**
+build/**

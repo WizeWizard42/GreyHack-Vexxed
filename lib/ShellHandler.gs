@@ -28,7 +28,7 @@ end function
 ShellHandler.inputMap["build"] = function(objRef, args)
     if args.len > 1 then srcPath = args[1] else srcPath = "/home/guest/dddd.src"
     if args.len > 2 then binPath = args[2] else binPath = "/home/guest"
-    if args.len > 3 then canImport = args[3] else canImport = 0
+    if args.len > 3 then canImport = args[3].to_int else canImport = 0
 
     objRef.buildFile(srcPath, binPath, canImport)
 end function

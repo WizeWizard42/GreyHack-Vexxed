@@ -104,6 +104,10 @@ Engine.handleInput = function(input)
 		
         session.vexxed["session"].handleInput(command)
         result = session.vexxed["session"].currHandler.handleInput(command)
-        if result isa GenericError then print(result.toString) else print(result)
+        if typeof(result) == "string" then
+            print(result)
+        else if result != null then
+            print(result.toString)
+        end if
     end for
 end function

@@ -41,7 +41,7 @@ end function
 
 Engine.promptPassword = function()
     input = user_input("Password: ", 1)
-	if input != "qr8HTwSQJkG14Ij9YQOFA6d1!z2$uj4q" then
+	if input != "" then // Put the password you want here
 		// TODO: Alert me when incorrect password is entered, maybe take other measures
 		exit("Wrong password, nice try.")
 	end if

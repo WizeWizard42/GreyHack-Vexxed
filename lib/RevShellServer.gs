@@ -7,23 +7,36 @@ RevShellServer.clients = []
 
 RevShellServer.inputMap = {}
 
-RevShellServer.inputMap["list"] = function(objRef, input)
+RevShellServer.inputMap["list"] = function(objRef, args)
     objRef.listClients
 end function
 
-RevShellServer.inputMap["refresh"] = function(objRef, input)
+RevShellServer.inputMap["refresh"] = function(objRef, args)
     objRef.updateClients(get_custom_object.vexxed["remoteMetax"])
 end function
 
 RevShellServer.inputMap["use"] = function(objRef, input)
-    if input.len < 2 then
+    if args.len < 2 then
         print("Usage: use <index>")
         return
     end if
 
     shell = new ShellHandler
-    objRef.setActiveClient(input[1].to_int, shell)
+    objRef.setActiveClient(args[1].to_int, shell)
     if shell.getObject then session.vexxed["session"].addHandler(shell)
+end function
+
+RevShellServer.inputMap["install"] = function(objRef, args)
+    objRef.installServer
+end function
+
+RevShellServer.inputMap["connect"] = function(objRef, args)
+    if args.len < 3 then
+        print("Usage: connect <ip> <port> <proc=Terminal.exe>")
+        return
+    end if
+    if not args.hasIndex(3) then args[3] = "Terminal.exe"
+    objRef.startClient(args[1], args[2].to_int, args[3])
 end function
 
 RevShellServer.getClients = function(metaxLib)
@@ -55,6 +68,24 @@ RevShellServer.setActiveClient = function(index, shellObj)
     else 
         print("Shell at index " + index + " does not exist.")
     end if
+end function
+
+RevShellServer.installServer = function()
+    SessionManager.currHandler.putFile("/root/VulnLibs/librshell.so")
+    rshelld = include_lib(current_path + "librshell.so")
+    if not rshelld then 
+        print("Failed to install reverse shell server.")
+        return
+    end if
+
+    result = rshelld.install_service
+    if result != true then
+        print("Error installing rshell: " + result)
+    end if
+end function
+
+RevShellServer.startClient = function(ip, port, proc)
+    session.vexxed["remoteMetax"].rshell_client(ip, port, proc)
 end function
 
 RevShellServer.handleInput = function(input)

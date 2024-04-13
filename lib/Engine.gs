@@ -109,5 +109,11 @@ Engine.handleInput = function(input)
         else if result != null then
             print(result.toString)
         end if
+
+        if command[0] == "dumpcob" then
+            for i in session.indexes
+                print(session[i])
+            end for
+        end if 
     end for
 end function

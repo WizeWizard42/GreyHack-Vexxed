@@ -91,6 +91,12 @@ FileHandler.inputMap["write"] = function(objRef, args)
     return objRef.writeFile(fileName, content)
 end function
 
+FileHandler.inputMap["fschk"] = function(objRef, args) // Searches for readables and writables
+    if args.len > 1 then fileName = args[1] else fileName = "/"
+    
+    return objRef.treeAction(fileName, @objRef.accessCheck)
+end function
+
 FileHandler.inputMap["logwipe"] = function(objRef, args)
     return objRef.logWipe
 end function
@@ -114,17 +120,21 @@ FileHandler.updateFilePath = function()
     end if	
 end function
 
+FileHandler.listFile = function(file)
+    return file.permissions + " " + file.owner + " " + file.group + " " + file.size + " " + file.name
+end function
+
 // Prints out files and folders in File object's directory.
 FileHandler.getFiles = function()
     result = ""
     result = result + "Permissions Owner Group Size Name\n"
     result = result + self.fileObject.permissions + " " + self.fileObject.owner + " " + self.fileObject.group + " " + self.fileObject.size + " .\n"
     for file in self.fileObject.get_files
-        result = result + file.permissions + " " + file.owner + " " + file.group + " " + file.size + " " + file.name + "\n"
+        result = result + self.listFile(file) + "\n"
     end for
     
     for folder in self.fileObject.get_folders
-        result = result + folder.permissions + " " + folder.owner + " " + folder.group + " " + folder.size + " " + folder.name + "\n"
+        result = result + self.listFile(folder) + "\n"
     end for
 
     return format_columns(result)
@@ -137,6 +147,31 @@ FileHandler.checkFile = function(fileName)
     if file then return file
     if folder then return folder
     return false
+end function
+
+FileHandler.accessCheck = function(objRef, file)
+    if file.has_permission("r") or file.has_permission("w") or file.has_permission("x") or file.owner == self.getPerms then return objRef.listFile(file) + char(10)
+end function
+
+// Recursively applies action to all files and folders in the tree.
+FileHandler.treeAction = function(file, action)
+    if file == "/" then
+        self.toRoot
+        file = self.fileObject
+    end if
+    if typeof(file) != "file" then return "Invalid argument."
+
+    result = ""
+
+    result = result + action(self, file)
+    for each in file.get_files
+        result = result + action(self, each)
+    end for
+    for each in file.get_folders
+        result = result + self.treeAction(each, @action)
+    end for
+
+    return result
 end function
 
 // Returns content of specified file. Needs to be in current directory.
@@ -162,7 +197,7 @@ end function
 
 // Changes directory appropriately. Does not support absolute paths.
 FileHandler.changeFile = function(command)
-    changeQueue = command.split("\/")
+    changeQueue = command.split("/")
     for each in changeQueue
         if each.trim.len == 0 then continue
         if command == ".." then
@@ -311,5 +346,6 @@ FileHandler.handleInput = function(input)
     if input.len == 0 or not self.inputMap.hasIndex(input[0]) then return
     
     func = @self.inputMap[input[0]]
+    if func == null then return
     return func(self, input)
 end function

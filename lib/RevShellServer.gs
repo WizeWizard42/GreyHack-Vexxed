@@ -15,7 +15,7 @@ RevShellServer.inputMap["refresh"] = function(objRef, args)
     objRef.updateClients(get_custom_object.vexxed["remoteMetax"])
 end function
 
-RevShellServer.inputMap["use"] = function(objRef, input)
+RevShellServer.inputMap["use"] = function(objRef, args)
     if args.len < 2 then
         print("Usage: use <index>")
         return
@@ -90,5 +90,8 @@ end function
 
 RevShellServer.handleInput = function(input)
     if input.len == 0 or not self.inputMap.hasIndex(input[0]) then return
-    self.inputMap[input[0]](self, input)
+            
+    func = @self.inputMap[input[0]]
+    if @func == null then return
+    return func(self, input)
 end function

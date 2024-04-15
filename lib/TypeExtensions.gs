@@ -24,6 +24,7 @@ list.first = function(key, value)
         if typeof(each) == "string" then
             if key == "is" and each == value then return each
             if key == "contains" and each.is_match(value) then return each
+            if key == "len" and each.len == value then return each
         else if typeof(each) == "file" then
             if key == "name" and each.name == value then return each
             if key == "namehas" and each.name.is_match(value) then ret.push(each)
@@ -53,6 +54,7 @@ list.where = function(key, value)
         if typeof(each) == "string" then
             if key == "is" and each == value then ret.push(each)
             if key == "contains" and each.is_match(value) then ret.push(each)
+            if key == "len" and each.len == value then ret.push(each)
         else if typeof(each) == "file" then
             if key == "name" and each.name == value then ret.push(each)
             if key == "namehas" and each.name.is_match(value) then ret.push(each)
@@ -83,6 +85,7 @@ list.wherenot = function(key, value)
         if typeof(each) == "string" then
             if key == "is" and each != value then ret.push(each)
             if key == "contains" and not each.is_match(value) then ret.push(each)
+            if key == "len" and each.len != value then ret.push(each)
         else if typeof(each) == "file" then
             if key == "name" and each.name != value then ret.push(each)
             if key == "namehas" and each.name.is_match(value) then ret.push(each)

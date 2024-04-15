@@ -62,39 +62,10 @@ Engine.handleInput = function(input)
     input = input.split("\|")
     for command in input
         command = command.trim.split(" ")
-    
-        if command[0] == "target" and command.len >= 3 then
-            overflowKey = "secstream"
-            if command.len >= 4 then overflowKey = command[3]
-
-            session.vexxed["session"].setCurrLib(session.vexxed["exploiter"].scanPort(command[1], command[2].to_int))
-            
-            session.vexxed["exploiter"].crackLib(session.vexxed["session"].currLib, overflowKey)
-
-            session.vexxed["exploiter"].printVulns(session.vexxed["session"]["currLib"])
-        end if
-
-        if command[0] == "use" and command.len == 2 then
-            session.vexxed["session"].addHandler(session.vexxed["exploiter"].resultObjects[session.vexxed["session"].currLib][command[1].to_int])
-        end if
+        command = command.wherenot("len", 0) // Remove empty strings
 
         if command[0] == "enumerate" and command.len == 2 then
             Enumerator.fullEnumerate(command[1])
-        end if
-
-        if command[0] == "local" and command.len >= 2 then
-            metaLib = session.vexxed["exploiter"].loadLib(command[1])
-
-            if metaLib then
-                overflowKey = "secstream"
-                if command.len >= 3 then overflowKey = command[2]
-
-                session.vexxed["session"].setCurrLib(session.vexxed["exploiter"].scanLib(metaLib))
-
-                session.vexxed["exploiter"].crackLib(session.vexxed["session"].currLib, overflowKey)
-
-                session.vexxed["exploiter"].printVulns(session.vexxed["session"].currLib)
-            end if
         end if
         
 		if command[0] == "revshell" then
@@ -102,13 +73,9 @@ Engine.handleInput = function(input)
 			continue
 		end if
 		
-        session.vexxed["session"].handleInput(command)
-        result = session.vexxed["session"].currHandler.handleInput(command)
-        if typeof(result) == "string" then
-            print(result)
-        else if result != null then
-            print(result.toString)
-        end if
+        self.handleOutput(session.vexxed["exploiter"].handleInput(command))
+        self.handleOutput(session.vexxed["session"].handleInput(command))
+        self.handleOutput(session.vexxed["session"].currHandler.handleInput(command))
 
         if command[0] == "dumpcob" then
             for i in session.indexes
@@ -116,4 +83,12 @@ Engine.handleInput = function(input)
             end for
         end if 
     end for
+end function
+
+Engine.handleOutput = function(output)
+    if typeof(output) == "string" then
+        print(output)
+    else if output != null then
+        print(output.toString)
+    end if
 end function

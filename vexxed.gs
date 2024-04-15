@@ -37,6 +37,7 @@ list.first = function(key, value)
         if typeof(each) == "string" then
             if key == "is" and each == value then return each
             if key == "contains" and each.is_match(value) then return each
+            if key == "len" and each.len == value then return each
         else if typeof(each) == "file" then
             if key == "name" and each.name == value then return each
             if key == "namehas" and each.name.is_match(value) then ret.push(each)
@@ -66,6 +67,7 @@ list.where = function(key, value)
         if typeof(each) == "string" then
             if key == "is" and each == value then ret.push(each)
             if key == "contains" and each.is_match(value) then ret.push(each)
+            if key == "len" and each.len == value then ret.push(each)
         else if typeof(each) == "file" then
             if key == "name" and each.name == value then ret.push(each)
             if key == "namehas" and each.name.is_match(value) then ret.push(each)
@@ -96,6 +98,7 @@ list.wherenot = function(key, value)
         if typeof(each) == "string" then
             if key == "is" and each != value then ret.push(each)
             if key == "contains" and not each.is_match(value) then ret.push(each)
+            if key == "len" and each.len != value then ret.push(each)
         else if typeof(each) == "file" then
             if key == "name" and each.name != value then ret.push(each)
             if key == "namehas" and each.name.is_match(value) then ret.push(each)
@@ -405,10 +408,7 @@ SessionManager.inputMap = {}
 
 SessionManager.inputMap["pop"] = function(objRef, args)
     if args.len > 1 then index = args[1] else index = -1
-    if objRef.handlerStack.len < 2 or index == 0 then
-        print("Error: cannot pop local shell.")
-        return
-    end if
+    if objRef.handlerStack.len < 2 or index == 0 then return GenericError.create("Error: cannot pop local shell.")
     objRef.handlerStack.remove(index)
     // If current handler was in stack, update it
     if not objRef.handlerStack.indexOf(objRef.currHandler) then
@@ -424,6 +424,11 @@ SessionManager.inputMap["hstack"] = function(objRef, args)
             print(handler.classID() + ": " + handler.getLANIP())
         end if
     end for
+end function
+
+SessionManager.inputMap["use"] = function(objRef, args)
+    if args.len < 2 then return "Usage: use [index]"
+    objRef.addHandler(session.vexxed["exploiter"].resultObjects[session.vexxed["session"].currLib][args[1].to_int])
 end function
 
 SessionManager.inputMap["switch"] = function(objRef, args)
@@ -464,11 +469,11 @@ SessionManager.importSession = function()
 end function
 
 SessionManager.handleInput = function(input)
-    if input.len == 0 or not self.inputMap.hasIndex(input[0]) then // Empty input or invalid command?
-        return
-    end if
-
-    self.inputMap[input[0]](self, input)
+    if input.len == 0 or not self.inputMap.hasIndex(input[0]) then return
+        
+    func = @self.inputMap[input[0]]
+    if @func == null then return
+    return func(self, input)
 end function
 
 ////////////////////////////////////////////////////////////////////////////////////
@@ -818,7 +823,7 @@ end function
 FileHandler.handleInput = function(input)
     if input.len == 0 or not self.inputMap.hasIndex(input[0]) then return
     
-    func = self.inputMap[input[0]]
+    func = @self.inputMap[input[0]]
     if @func == null then return
     return func(self, input)
 end function
@@ -1122,6 +1127,40 @@ Exploiter.scanResult = {} // {"(libname)-(libversion)": {"(memory)": ["(value)",
 
 Exploiter.metaLibs = {} // {"(libname)-(libversion): metaLib", ...}
 
+Exploiter.inputMap = {}
+
+Exploiter.inputMap["scan"] = function(objRef, args)
+	if args.len < 3 then return "Usage: scan [ip] [port]"
+
+	lib_id = objRef.scanPort(args[1], args[2].to_int)
+	if not lib_id then return "Library was unable to be scanned." else return session.vexxed["session"].setCurrLib(lib_id)
+end function
+
+Exploiter.inputMap["load"] = function(objRef, args)
+	if args.len < 2 then return "Usage: load [path]"
+
+	lib_id = objRef.scanLib(objRef.loadLib(args[1]))
+	if not lib_id then return "Library was unable to be loaded." else return session.vexxed["session"].setCurrLib(lib_id)
+end function
+
+Exploiter.inputMap["local"] = function(objRef, args)
+	if args.len < 3 then return "Usage: local [path] [optVal]"
+
+	result = objRef.inputMap.load(objRef, args)
+	if result then return result
+	objRef.crackLib(session.vexxed["session"].currLib, args[2])
+	objRef.printVulns(session.vexxed["session"].currLib)
+end function
+
+Exploiter.inputMap["target"] = function(objRef, args)
+	if args.len < 4 then return "Usage: target [ip] [port] [optVal]"
+
+	result = objRef.inputMap.scan(objRef, args)
+	if result then return result
+	objRef.crackLib(session.vexxed["session"].currLib, args[3])
+	objRef.printVulns(session.vexxed["session"].currLib)
+end function
+
 // Parses sec values from overflow output as a list.
 Exploiter.scanParse = function(results)
 	found = false
@@ -1292,6 +1331,14 @@ Exploiter.printVulns = function(lib_id)
 	print(format_columns(info))
 end function
 
+Exploiter.handleInput = function(input)
+	if input.len == 0 or not self.inputMap.hasIndex(input[0]) then return
+		
+	func = @self.inputMap[input[0]]
+	if @func == null then return
+	return func(self, input)
+end function
+
 ////////////////////////////////////////////////////////////////////////////////////
 
 // File: RevShellServer.gs
@@ -1310,7 +1357,7 @@ RevShellServer.inputMap["refresh"] = function(objRef, args)
     objRef.updateClients(get_custom_object.vexxed["remoteMetax"])
 end function
 
-RevShellServer.inputMap["use"] = function(objRef, input)
+RevShellServer.inputMap["use"] = function(objRef, args)
     if args.len < 2 then
         print("Usage: use <index>")
         return
@@ -1385,7 +1432,10 @@ end function
 
 RevShellServer.handleInput = function(input)
     if input.len == 0 or not self.inputMap.hasIndex(input[0]) then return
-    self.inputMap[input[0]](self, input)
+            
+    func = @self.inputMap[input[0]]
+    if @func == null then return
+    return func(self, input)
 end function
 
 ////////////////////////////////////////////////////////////////////////////////////
@@ -1450,39 +1500,10 @@ Engine.handleInput = function(input)
     input = input.split("\|")
     for command in input
         command = command.trim.split(" ")
-    
-        if command[0] == "target" and command.len >= 3 then
-            overflowKey = "secstream"
-            if command.len >= 4 then overflowKey = command[3]
-
-            session.vexxed["session"].setCurrLib(session.vexxed["exploiter"].scanPort(command[1], command[2].to_int))
-            
-            session.vexxed["exploiter"].crackLib(session.vexxed["session"].currLib, overflowKey)
-
-            session.vexxed["exploiter"].printVulns(session.vexxed["session"]["currLib"])
-        end if
-
-        if command[0] == "use" and command.len == 2 then
-            session.vexxed["session"].addHandler(session.vexxed["exploiter"].resultObjects[session.vexxed["session"].currLib][command[1].to_int])
-        end if
+        command = command.wherenot("len", 0) // Remove empty strings
 
         if command[0] == "enumerate" and command.len == 2 then
             Enumerator.fullEnumerate(command[1])
-        end if
-
-        if command[0] == "local" and command.len >= 2 then
-            metaLib = session.vexxed["exploiter"].loadLib(command[1])
-
-            if metaLib then
-                overflowKey = "secstream"
-                if command.len >= 3 then overflowKey = command[2]
-
-                session.vexxed["session"].setCurrLib(session.vexxed["exploiter"].scanLib(metaLib))
-
-                session.vexxed["exploiter"].crackLib(session.vexxed["session"].currLib, overflowKey)
-
-                session.vexxed["exploiter"].printVulns(session.vexxed["session"].currLib)
-            end if
         end if
         
 		if command[0] == "revshell" then
@@ -1490,13 +1511,9 @@ Engine.handleInput = function(input)
 			continue
 		end if
 		
-        session.vexxed["session"].handleInput(command)
-        result = session.vexxed["session"].currHandler.handleInput(command)
-        if typeof(result) == "string" then
-            print(result)
-        else if result != null then
-            print(result.toString)
-        end if
+        self.handleOutput(session.vexxed["exploiter"].handleInput(command))
+        self.handleOutput(session.vexxed["session"].handleInput(command))
+        self.handleOutput(session.vexxed["session"].currHandler.handleInput(command))
 
         if command[0] == "dumpcob" then
             for i in session.indexes
@@ -1504,6 +1521,14 @@ Engine.handleInput = function(input)
             end for
         end if 
     end for
+end function
+
+Engine.handleOutput = function(output)
+    if typeof(output) == "string" then
+        print(output)
+    else if output != null then
+        print(output.toString)
+    end if
 end function
 
 ////////////////////////////////////////////////////////////////////////////////////

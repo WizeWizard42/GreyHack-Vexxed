@@ -12,10 +12,7 @@ SessionManager.inputMap = {}
 
 SessionManager.inputMap["pop"] = function(objRef, args)
     if args.len > 1 then index = args[1] else index = -1
-    if objRef.handlerStack.len < 2 or index == 0 then
-        print("Error: cannot pop local shell.")
-        return
-    end if
+    if objRef.handlerStack.len < 2 or index == 0 then return GenericError.create("Error: cannot pop local shell.")
     objRef.handlerStack.remove(index)
     // If current handler was in stack, update it
     if not objRef.handlerStack.indexOf(objRef.currHandler) then
@@ -31,6 +28,11 @@ SessionManager.inputMap["hstack"] = function(objRef, args)
             print(handler.classID() + ": " + handler.getLANIP())
         end if
     end for
+end function
+
+SessionManager.inputMap["use"] = function(objRef, args)
+    if args.len < 2 then return "Usage: use [index]"
+    objRef.addHandler(session.vexxed["exploiter"].resultObjects[session.vexxed["session"].currLib][args[1].to_int])
 end function
 
 SessionManager.inputMap["switch"] = function(objRef, args)
@@ -71,9 +73,9 @@ SessionManager.importSession = function()
 end function
 
 SessionManager.handleInput = function(input)
-    if input.len == 0 or not self.inputMap.hasIndex(input[0]) then // Empty input or invalid command?
-        return
-    end if
-
-    self.inputMap[input[0]](self, input)
+    if input.len == 0 or not self.inputMap.hasIndex(input[0]) then return
+        
+    func = @self.inputMap[input[0]]
+    if func == null then return
+    return func(self, input)
 end function

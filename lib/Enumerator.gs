@@ -21,8 +21,6 @@ Enumerator.fullEnumerate = function(ip)
     
     print("\nLocal IPs detected: ")
     for lan in router.devices_lan_ip
-        if lan == router.local_ip then continue
-        
         print("\nLAN: " + lan)
         print("Ports detected: ")
         for port in router.device_ports(lan)

@@ -35,7 +35,7 @@ RevShellServer.inputMap["connect"] = function(objRef, args)
         print("Usage: connect <ip> <port> <proc=Terminal.exe>")
         return
     end if
-    if not args.hasIndex(3) then args[3] = "Terminal.exe"
+    if not args.hasIndex(3) then args.push("Terminal.exe")
     objRef.startClient(args[1], args[2].to_int, args[3])
 end function
 
@@ -71,8 +71,9 @@ RevShellServer.setActiveClient = function(index, shellObj)
 end function
 
 RevShellServer.installServer = function()
-    SessionManager.currHandler.putFile("/root/VulnLibs/librshell.so")
-    rshelld = include_lib(current_path + "librshell.so")
+    session.vexxed["session"].currHandler.putFile("/root/VulnLibs/librshell.so")
+    session.vexxed["session"].currHandler.moveFile("librshell.so", "/lib/", "librshell.so")
+    rshelld = include_lib("/lib/librshell.so")
     if not rshelld then 
         print("Failed to install reverse shell server.")
         return

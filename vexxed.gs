@@ -1107,8 +1107,6 @@ Enumerator.fullEnumerate = function(ip)
     
     print("\nLocal IPs detected: ")
     for lan in router.devices_lan_ip
-        if lan == router.local_ip then continue
-        
         print("\nLAN: " + lan)
         print("Ports detected: ")
         for port in router.device_ports(lan)
@@ -1150,6 +1148,12 @@ Exploiter.inputMap["local"] = function(objRef, args)
 	if result then return result
 	objRef.crackLib(session.vexxed["session"].currLib, args[2])
 	objRef.printVulns(session.vexxed["session"].currLib)
+end function
+
+Exploiter.inputMap["crack"] = function(objRef, args)
+	if args.len < 2 then return "Usage: crack [hash/file]"
+
+	return objRef.crackHash(args[1])
 end function
 
 Exploiter.inputMap["target"] = function(objRef, args)
@@ -1210,6 +1214,24 @@ Exploiter.scanLib = function(metaLib)
 
 	self.saveResult
 	return lib_id
+end function
+
+Exploiter.crackHash = function(hash)
+	file = session.vexxed["session"].currHandler.checkFile(hash)
+	if not file then return session.vexxed["homeCrypto"].decipher(hash)
+	if file.is_folder then return GenericError.create("Error: cannot crack a folder.")
+
+	// Credit to MachaCeleste for this snippet.
+	accounts = file.get_content.split(char(10))
+	info = "User Password"
+	for account in accounts
+	    account = account.trim
+	    if account.len < 33 then continue
+	    enc = account.split(":")
+	    dec = decipher(session.vexxed["homeCrypto"], enc[1])
+	    info = info + "\n" + enc[0] + " " + dec
+	end for
+	return format_columns(info)
 end function
 
 // Loads a lib from a remote computer, used in remote exploits. Returns a NetSession object.
@@ -1377,7 +1399,7 @@ RevShellServer.inputMap["connect"] = function(objRef, args)
         print("Usage: connect <ip> <port> <proc=Terminal.exe>")
         return
     end if
-    if not args.hasIndex(3) then args[3] = "Terminal.exe"
+    if not args.hasIndex(3) then args.push("Terminal.exe")
     objRef.startClient(args[1], args[2].to_int, args[3])
 end function
 
@@ -1413,8 +1435,9 @@ RevShellServer.setActiveClient = function(index, shellObj)
 end function
 
 RevShellServer.installServer = function()
-    SessionManager.currHandler.putFile("/root/VulnLibs/librshell.so")
-    rshelld = include_lib(current_path + "librshell.so")
+    session.vexxed["session"].currHandler.putFile("/root/VulnLibs/librshell.so")
+    session.vexxed["session"].currHandler.moveFile("librshell.so", "/lib/", "librshell.so")
+    rshelld = include_lib("/lib/librshell.so")
     if not rshelld then 
         print("Failed to install reverse shell server.")
         return
@@ -1519,7 +1542,7 @@ Engine.handleInput = function(input)
             for i in session.indexes
                 print(session[i])
             end for
-        end if 
+        end if
     end for
 end function
 

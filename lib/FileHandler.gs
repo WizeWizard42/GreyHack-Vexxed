@@ -21,77 +21,46 @@ FileHandler.inputMap["ls"] = function(objRef, args)
 end function
 
 FileHandler.inputMap["cat"] = function(objRef, args)
-    if args.len > 1 then fileName = args[1] else fileName = "passwd"
-
-    return objRef.readFile(fileName)
+    if args.len > 1 then return objRef.readFile(args[1]) else return "Usage: cat [file]"
 end function
 
 FileHandler.inputMap["rm"] = function(objRef, args)
-    if args.len > 1 then fileName = args[1] else fileName = "passwd"
-
-    return objRef.deleteFile(fileName)
+    if args.len > 1 then return objRef.deleteFile(args[1]) else return "Usage: rm [file]"
 end function
 
 FileHandler.inputMap["cd"] = function(objRef, args)
-    if args.len > 1 then command = args[1] else command = "var"
-
-    return objRef.changeFile(command)
+    if args.len > 1 then return objRef.changeFile(args[1]) else return "Usage: cd [directory]" 
 end function
 
 FileHandler.inputMap["cp"] = function(objRef, args)
-    if args.len > 1 then fileName = args[1] else fileName = "system.log"
-    if args.len > 2 then filePath = args[2] else filePath = "/var/"
-    if args.len > 3 then newName = args[3] else newName = fileName
-
-    return objRef.copyFile(fileName, filePath, newName)
+    if args.len > 3 then return objRef.copyFile(args[1], args[2], args[3]) else return "Usage: cp [file] [path] [newName]"
 end function
 
 FileHandler.inputMap["mv"] = function(objRef, args)
-    if args.len > 1 then filePath = args[1] else filePath = "/home/guest/"
-    if args.len > 2 then fileName = args[2] else fileName = "newfile"
-    if args.len > 3 then newName = args[3] else newName = fileName
-
-    return objRef.moveFile(fileName, filePath, newName)
+    if args.len > 3 then return objRef.moveFile(args[1], args[2], args[3]) else return "Usage: mv [file] [path] [newName]"  
 end function
 
-FileHandler.inputMap["getText"] = function(objRef, args)
-    if args.len > 1 then fileName = args[1] else fileName = "passwd"
-
-    return objRef.getTextFile(fileName)
+FileHandler.inputMap["gettext"] = function(objRef, args)
+    if args.len > 1 then return objRef.getTextFile(args[1]) else return "Usage: gettext [file]"    
 end function
 
 FileHandler.inputMap["chmod"] = function(objRef, args)
-    if args.len > 1 then fileName = args[1] else fileName = "."
-    if args.len > 2 then newPerms = args[2] else newPerms = "777"
-    if args.len > 3 then recursive = args[3].to_int else recursive = 0
-
-    return objRef.changePerms(fileName, newPerms, recursive)
+    if args.len > 3 then return objRef.changePerms(args[1], args[2], args[3].to_int) else return "Usage: chmod [file] [perms] [recursive]"
 end function
 
 FileHandler.inputMap["chgrp"] = function(objRef, args)
-    if args.len > 1 then fileName = args[1] else fileName = "."
-    if args.len > 2 then newGroup = args[2] else newGroup = "guest"
-    if args.len > 3 then recursive = args[3].to_int else recursive = 0
-
-    return objRef.changeGroup(fileName, newGroup, recursive)
+    if args.len > 3 then return objRef.changeGroup(args[1], args[2], args[3].to_int) else return "Usage: chgrp [file] [group] [recursive]"
 end function
 
 FileHandler.inputMap["chown"] = function(objRef, args)
-    if args.len > 1 then fileName = args[1] else fileName = "."
-    if args.len > 2 then newOwner = args[2] else newOwner = "guest"
-    if args.len > 3 then recursive = args[3].to_int else recursive = 0
-
-    return objRef.changeOwner(fileName, newOwner, recursive)
+    if args.len > 3 then return objRef.changeOwner(args[1], args[2], args[3].to_int) else return "Usage: chown [file] [owner] [recursive]" 
 end function
 
 FileHandler.inputMap["write"] = function(objRef, args)
-    if args.len > 1 then fileName = args[1] else fileName = "fstab"
-    if args.len > 2 then content = args[2] else content = "rosebud"
-
-    return objRef.writeFile(fileName, content)
+    if args.len > 2 then return objRef.writeFile(args[1], args[2:].join(" ")) else return "Usage: write [file] [content]"
 end function
 
-FileHandler.inputMap["fschk"] = function(objRef, args) // Searches for readables and writables
+FileHandler.inputMap["fschk"] = function(objRef, args) // Searches for accessible files and folders in the file system.
     if args.len > 1 then fileName = args[1] else fileName = "/"
     
     return objRef.treeAction(fileName, @objRef.accessCheck)
@@ -199,7 +168,7 @@ end function
 FileHandler.changeFile = function(command)
     changeQueue = command.split("/")
     for each in changeQueue
-        if each.trim.len == 0 then continue
+        if each.trim.len == 0 or each == "." then continue
         if command == ".." then
             if self.fileObject.parent then
                 self.fileObject = self.fileObject.parent
@@ -343,9 +312,8 @@ end function
 
 // As inputMap is updated in better objects, more commands can be used
 FileHandler.handleInput = function(input)
-    if input.len == 0 or not self.inputMap.hasIndex(input[0]) then return
-    
+    if input.len == 0 or not self.inputMap.hasMethod(input[0]) then return
+                
     func = @self.inputMap[input[0]]
-    if @func == null then return
     return func(self, input)
 end function

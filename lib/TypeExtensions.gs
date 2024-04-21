@@ -19,6 +19,15 @@ map.wherenot = function(key, value)
     end for
     return ret
 end function
+map.hasMethod = function(method)
+    ref = self
+    if ref.hasIndex(method) then return true
+    while ref.hasIndex("__isa")
+        ref = ref["__isa"]
+        if ref.hasIndex(method) then return true
+    end while
+    return false
+end function
 list.first = function(key, value)
     for each in self
         if typeof(each) == "string" then

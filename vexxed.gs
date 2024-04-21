@@ -32,6 +32,15 @@ map.wherenot = function(key, value)
     end for
     return ret
 end function
+map.hasMethod = function(method)
+    ref = self
+    if ref.hasIndex(method) then return true
+    while ref.hasIndex("__isa")
+        ref = ref["__isa"]
+        if ref.hasIndex(method) then return true
+    end while
+    return false
+end function
 list.first = function(key, value)
     for each in self
         if typeof(each) == "string" then
@@ -469,10 +478,9 @@ SessionManager.importSession = function()
 end function
 
 SessionManager.handleInput = function(input)
-    if input.len == 0 or not self.inputMap.hasIndex(input[0]) then return
-        
+    if input.len == 0 or not self.inputMap.hasMethod(input[0]) then return
+                
     func = @self.inputMap[input[0]]
-    if @func == null then return
     return func(self, input)
 end function
 
@@ -499,77 +507,46 @@ FileHandler.inputMap["ls"] = function(objRef, args)
 end function
 
 FileHandler.inputMap["cat"] = function(objRef, args)
-    if args.len > 1 then fileName = args[1] else fileName = "passwd"
-
-    return objRef.readFile(fileName)
+    if args.len > 1 then return objRef.readFile(args[1]) else return "Usage: cat [file]"
 end function
 
 FileHandler.inputMap["rm"] = function(objRef, args)
-    if args.len > 1 then fileName = args[1] else fileName = "passwd"
-
-    return objRef.deleteFile(fileName)
+    if args.len > 1 then return objRef.deleteFile(args[1]) else return "Usage: rm [file]"
 end function
 
 FileHandler.inputMap["cd"] = function(objRef, args)
-    if args.len > 1 then command = args[1] else command = "var"
-
-    return objRef.changeFile(command)
+    if args.len > 1 then return objRef.changeFile(args[1]) else return "Usage: cd [directory]" 
 end function
 
 FileHandler.inputMap["cp"] = function(objRef, args)
-    if args.len > 1 then fileName = args[1] else fileName = "system.log"
-    if args.len > 2 then filePath = args[2] else filePath = "/var/"
-    if args.len > 3 then newName = args[3] else newName = fileName
-
-    return objRef.copyFile(fileName, filePath, newName)
+    if args.len > 3 then return objRef.copyFile(args[1], args[2], args[3]) else return "Usage: cp [file] [path] [newName]"
 end function
 
 FileHandler.inputMap["mv"] = function(objRef, args)
-    if args.len > 1 then filePath = args[1] else filePath = "/home/guest/"
-    if args.len > 2 then fileName = args[2] else fileName = "newfile"
-    if args.len > 3 then newName = args[3] else newName = fileName
-
-    return objRef.moveFile(fileName, filePath, newName)
+    if args.len > 3 then return objRef.moveFile(args[1], args[2], args[3]) else return "Usage: mv [file] [path] [newName]"  
 end function
 
-FileHandler.inputMap["getText"] = function(objRef, args)
-    if args.len > 1 then fileName = args[1] else fileName = "passwd"
-
-    return objRef.getTextFile(fileName)
+FileHandler.inputMap["gettext"] = function(objRef, args)
+    if args.len > 1 then return objRef.getTextFile(args[1]) else return "Usage: gettext [file]"    
 end function
 
 FileHandler.inputMap["chmod"] = function(objRef, args)
-    if args.len > 1 then fileName = args[1] else fileName = "."
-    if args.len > 2 then newPerms = args[2] else newPerms = "777"
-    if args.len > 3 then recursive = args[3].to_int else recursive = 0
-
-    return objRef.changePerms(fileName, newPerms, recursive)
+    if args.len > 3 then return objRef.changePerms(args[1], args[2], args[3].to_int) else return "Usage: chmod [file] [perms] [recursive]"
 end function
 
 FileHandler.inputMap["chgrp"] = function(objRef, args)
-    if args.len > 1 then fileName = args[1] else fileName = "."
-    if args.len > 2 then newGroup = args[2] else newGroup = "guest"
-    if args.len > 3 then recursive = args[3].to_int else recursive = 0
-
-    return objRef.changeGroup(fileName, newGroup, recursive)
+    if args.len > 3 then return objRef.changeGroup(args[1], args[2], args[3].to_int) else return "Usage: chgrp [file] [group] [recursive]"
 end function
 
 FileHandler.inputMap["chown"] = function(objRef, args)
-    if args.len > 1 then fileName = args[1] else fileName = "."
-    if args.len > 2 then newOwner = args[2] else newOwner = "guest"
-    if args.len > 3 then recursive = args[3].to_int else recursive = 0
-
-    return objRef.changeOwner(fileName, newOwner, recursive)
+    if args.len > 3 then return objRef.changeOwner(args[1], args[2], args[3].to_int) else return "Usage: chown [file] [owner] [recursive]" 
 end function
 
 FileHandler.inputMap["write"] = function(objRef, args)
-    if args.len > 1 then fileName = args[1] else fileName = "fstab"
-    if args.len > 2 then content = args[2] else content = "rosebud"
-
-    return objRef.writeFile(fileName, content)
+    if args.len > 2 then return objRef.writeFile(args[1], args[2:].join(" ")) else return "Usage: write [file] [content]"
 end function
 
-FileHandler.inputMap["fschk"] = function(objRef, args) // Searches for readables and writables
+FileHandler.inputMap["fschk"] = function(objRef, args) // Searches for accessible files and folders in the file system.
     if args.len > 1 then fileName = args[1] else fileName = "/"
     
     return objRef.treeAction(fileName, @objRef.accessCheck)
@@ -677,7 +654,7 @@ end function
 FileHandler.changeFile = function(command)
     changeQueue = command.split("/")
     for each in changeQueue
-        if each.trim.len == 0 then continue
+        if each.trim.len == 0 or each == "." then continue
         if command == ".." then
             if self.fileObject.parent then
                 self.fileObject = self.fileObject.parent
@@ -821,10 +798,9 @@ end function
 
 // As inputMap is updated in better objects, more commands can be used
 FileHandler.handleInput = function(input)
-    if input.len == 0 or not self.inputMap.hasIndex(input[0]) then return
-    
+    if input.len == 0 or not self.inputMap.hasMethod(input[0]) then return
+                
     func = @self.inputMap[input[0]]
-    if @func == null then return
     return func(self, input)
 end function
 
@@ -840,45 +816,38 @@ ComputerHandler.classID = "ComputerHandler"
 
 ComputerHandler.displayID = "Computer"
 
+ComputerHandler.inputMap = new FileHandler.inputMap // Don't just access the prototype, create a new object. Learned that the hard way :(
+
 ComputerHandler.inputMap["ps"] = function(objRef, args)
     return objRef.getProcesses
 end function
 
-ComputerHandler.inputMap["kill"] = function(objRef, args)
-    if args.len > 1 then pid = args[1] else pid = 0
+ComputerHandler.inputMap["ifconfig"] = function(objRef, args)
+    return objRef.netInfo
+end function
 
-    return objRef.closeProcess(pid.to_int)
+ComputerHandler.inputMap["kill"] = function(objRef, args)
+    if args.len > 1 then return objRef.closeProcess(args[1].to_int) else return "Usage: kill [pid]"
 end function
 
 ComputerHandler.inputMap["useradd"] = function(objRef, args)
-    if args.len > 1 then username = args[1] else username = "user"
-
-    return objRef.userAdd(username, "secretpassword")
+    if args.len > 2 then return objRef.userAdd(args[1], args[2]) else return "Usage: useradd [username] [password]"
 end function
 
 ComputerHandler.inputMap["passwd"] = function(objRef, args)
-    if args.len > 1 then username = args[1] else username = "user"
-    if args.len > 2 then pass = args[2] else pass = "secretpasswd"
-
-    return objRef.changePass(username, pass)
+    if args.len > 2 then return objRef.changePass(args[1], args[2]) else return "Usage: passwd [username] [password]"
 end function
 
 ComputerHandler.inputMap["touch"] = function(objRef, args)
-    if args.len > 1 then fileName = args[1] else fileName = "file.txt"
-
-    return objRef.createFile(objRef.fileObject.path, fileName)
+    if args.len > 1 then return objRef.createFile(objRef.fileObject.path, args[1]) else return "Usage: touch [filename]"
 end function
 
 ComputerHandler.inputMap["mkdir"] = function(objRef, args)
-    if args.len > 1 then folder = args[1] else folder = "dir"
-
-    return objRef.createFolder(objRef.fileObject.path, folder)
+    if args.len > 1 then return objRef.createFolder(objRef.fileObject.path, args[1]) else return "Usage: mkdir [foldername]"
 end function
 
 ComputerHandler.inputMap["iwlist"] = function(objRef, args)
-    if args.len > 1 then interface = args[1] else interface = "wlan0"
-
-    return objRef.getWiFiObjects(interface)
+    if args.len > 1 then return objRef.getWiFiObjects(args[1]) else return "Usage: iwlist [interface]"
 end function
 
 ComputerHandler.getObject = function()
@@ -924,6 +893,10 @@ ComputerHandler.createFolder = function(path, folder)
     if result != true then return ComputerMkdirError.create(path, folder, result)
 end function
 
+ComputerHandler.netInfo = function()
+    return format_columns("Local IP: " + self.getLANIP + "\nPublic IP: " + self.getPubIP + "\nActive card: " + self.getActiveCard + "\nInterfaces: " + self.getInterfaces)
+end function
+
 ComputerHandler.getActiveCard = function()
     return self.computerObject.active_net_card
 end function
@@ -963,51 +936,35 @@ ShellHandler.classID = "ShellHandler"
 
 ShellHandler.displayID = "Shell"
 
+ShellHandler.inputMap = new ComputerHandler.inputMap // Again, don't just access the prototype, create a new object.
+
 ShellHandler.inputMap["shell"] = function(objRef, args)
     objRef.dropShell
 end function
 
 ShellHandler.inputMap["get"] = function(objRef, args)
-    if args.len > 1 then fileName = args[1] else fileName = "system.log"
-
-    objRef.getFile(fileName)
+    if args.len > 1 then return objRef.getFile(args[1]) else return "Usage: get [filename]"
 end function
 
 ShellHandler.inputMap["put"] = function(objRef, args)
-    if args.len > 1 then filePath = args[1] else filePath = "system.log"
-
-    objRef.putFile(filePath)
+    if args.len > 1 then return objRef.putFile(args[1]) else return "Usage: put [filepath]"
 end function
 
 ShellHandler.inputMap["build"] = function(objRef, args)
-    if args.len > 1 then srcPath = args[1] else srcPath = "/home/guest/dddd.src"
-    if args.len > 2 then binPath = args[2] else binPath = "/home/guest"
-    if args.len > 3 then canImport = args[3].to_int else canImport = 0
-
-    objRef.buildFile(srcPath, binPath, canImport)
+    if args.len > 3 then return objRef.buildFile(args[1], args[2], args[3]) else return "Usage: build [srcPath] [binPath] [canImport]"
 end function
 
 ShellHandler.inputMap["launch"] = function(objRef, args)
-	if args.len > 1 then filePath = args[1] else filePath = "/home/guest/dddd"
-	if args.len > 2 then launchParams = args[2:].join(" ") else launchParams = ""
-
-	objRef.launchFile(filePath, launchParams)
+    if args.len == 2 then return objRef.launchFile(args[1], "")
+	if args.len > 2 then return objRef.launchFile(args[1], args[2:].join(" ")) else return "Usage: launch [filePath] [args]"
 end function
 
 ShellHandler.inputMap["sudo"] = function(objRef, args)
-    if args.len > 1 then userName = args[1] else userName = ""
-    if args.len > 2 then userPass = args[2] else userPass = ""
-
-    objRef.trySudo(userName, userPass)
+    if args.len > 2 then return objRef.trySudo(userName, userPass) else return "Usage: sudo [username] [password]"
 end function
 
 ShellHandler.inputMap["connect"] = function(objRef, args)
-    if args.len > 1 then ip = args[1] else ip = "1.1.1.1"
-    if args.len > 2 then port = args[2].to_int else port = "22"
-    if args.len > 3 then username = args[3] else username = "root"
-    if args.len > 4 then userPass = args[4] else userPass = "root"
-
-    objRef.connectService(ip, port, username, userPass)
+    if args.len > 4 then return objRef.connectService(ip, port, username, userPass) else return "Usage: connect [ip] [port] [username] [password]"
 end function
 
 ShellHandler.getObject = function()
@@ -1354,10 +1311,9 @@ Exploiter.printVulns = function(lib_id)
 end function
 
 Exploiter.handleInput = function(input)
-	if input.len == 0 or not self.inputMap.hasIndex(input[0]) then return
-		
+	if input.len == 0 or not self.inputMap.hasMethod(input[0]) then return
+			
 	func = @self.inputMap[input[0]]
-	if @func == null then return
 	return func(self, input)
 end function
 
@@ -1454,10 +1410,9 @@ RevShellServer.startClient = function(ip, port, proc)
 end function
 
 RevShellServer.handleInput = function(input)
-    if input.len == 0 or not self.inputMap.hasIndex(input[0]) then return
-            
+    if input.len == 0 or not self.inputMap.hasMethod(input[0]) then return
+                
     func = @self.inputMap[input[0]]
-    if @func == null then return
     return func(self, input)
 end function
 
@@ -1511,14 +1466,13 @@ end function
 Engine.promptUser = function()
     while true
         input = user_input("[" + session.vexxed["session"].currHandler.displayID + ":" + session.vexxed["session"].currHandler.getPubIP + ":" + session.vexxed["session"].currHandler.getLANIP + "] " + session.vexxed["session"].currHandler.fileObject.path + "# ")
-        self.handleInput(input)
+        self.handleInput(input.trim)
     end while
 end function
 
 Engine.handleInput = function(input)
-    if input == "exit" then
-        exit("Exiting program.")
-    end if
+    if input == "exit" then exit("Exiting program.")
+    if input == "clear" then clear_screen
 
     input = input.split("\|")
     for command in input

@@ -90,9 +90,8 @@ RevShellServer.startClient = function(ip, port, proc)
 end function
 
 RevShellServer.handleInput = function(input)
-    if input.len == 0 or not self.inputMap.hasIndex(input[0]) then return
-            
+    if input.len == 0 or not self.inputMap.hasMethod(input[0]) then return
+                
     func = @self.inputMap[input[0]]
-    if @func == null then return
     return func(self, input)
 end function

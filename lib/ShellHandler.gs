@@ -9,51 +9,35 @@ ShellHandler.classID = "ShellHandler"
 
 ShellHandler.displayID = "Shell"
 
+ShellHandler.inputMap = new ComputerHandler.inputMap // Again, don't just access the prototype, create a new object.
+
 ShellHandler.inputMap["shell"] = function(objRef, args)
     objRef.dropShell
 end function
 
 ShellHandler.inputMap["get"] = function(objRef, args)
-    if args.len > 1 then fileName = args[1] else fileName = "system.log"
-
-    objRef.getFile(fileName)
+    if args.len > 1 then return objRef.getFile(args[1]) else return "Usage: get [filename]"
 end function
 
 ShellHandler.inputMap["put"] = function(objRef, args)
-    if args.len > 1 then filePath = args[1] else filePath = "system.log"
-
-    objRef.putFile(filePath)
+    if args.len > 1 then return objRef.putFile(args[1]) else return "Usage: put [filepath]"
 end function
 
 ShellHandler.inputMap["build"] = function(objRef, args)
-    if args.len > 1 then srcPath = args[1] else srcPath = "/home/guest/dddd.src"
-    if args.len > 2 then binPath = args[2] else binPath = "/home/guest"
-    if args.len > 3 then canImport = args[3].to_int else canImport = 0
-
-    objRef.buildFile(srcPath, binPath, canImport)
+    if args.len > 3 then return objRef.buildFile(args[1], args[2], args[3]) else return "Usage: build [srcPath] [binPath] [canImport]"
 end function
 
 ShellHandler.inputMap["launch"] = function(objRef, args)
-	if args.len > 1 then filePath = args[1] else filePath = "/home/guest/dddd"
-	if args.len > 2 then launchParams = args[2:].join(" ") else launchParams = ""
-
-	objRef.launchFile(filePath, launchParams)
+    if args.len == 2 then return objRef.launchFile(args[1], "")
+	if args.len > 2 then return objRef.launchFile(args[1], args[2:].join(" ")) else return "Usage: launch [filePath] [args]"
 end function
 
 ShellHandler.inputMap["sudo"] = function(objRef, args)
-    if args.len > 1 then userName = args[1] else userName = ""
-    if args.len > 2 then userPass = args[2] else userPass = ""
-
-    objRef.trySudo(userName, userPass)
+    if args.len > 2 then return objRef.trySudo(userName, userPass) else return "Usage: sudo [username] [password]"
 end function
 
 ShellHandler.inputMap["connect"] = function(objRef, args)
-    if args.len > 1 then ip = args[1] else ip = "1.1.1.1"
-    if args.len > 2 then port = args[2].to_int else port = "22"
-    if args.len > 3 then username = args[3] else username = "root"
-    if args.len > 4 then userPass = args[4] else userPass = "root"
-
-    objRef.connectService(ip, port, username, userPass)
+    if args.len > 4 then return objRef.connectService(ip, port, username, userPass) else return "Usage: connect [ip] [port] [username] [password]"
 end function
 
 ShellHandler.getObject = function()

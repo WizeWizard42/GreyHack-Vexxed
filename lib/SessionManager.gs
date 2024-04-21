@@ -23,9 +23,9 @@ end function
 SessionManager.inputMap["hstack"] = function(objRef, args)
     for handler in objRef.handlerStack
         if handler == objRef.currHandler then
-            print("* " + handler.classID() + ": " + handler.getLANIP())
+            print(objRef.handlerStack.indexOf(handler) + "* " + handler.classID + ": " + handler.getPubIP + " " + handler.getLANIP)
         else
-            print(handler.classID() + ": " + handler.getLANIP())
+            print(objRef.handlerStack.indexOf(handler) + " " + handler.classID + ": " + handler.getPubIP + " " + handler.getLANIP)
         end if
     end for
 end function

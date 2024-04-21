@@ -33,11 +33,12 @@ ShellHandler.inputMap["launch"] = function(objRef, args)
 end function
 
 ShellHandler.inputMap["sudo"] = function(objRef, args)
-    if args.len > 2 then return objRef.trySudo(userName, userPass) else return "Usage: sudo [username] [password]"
+    if args.len == 1 then return objRef.trySudo("", "")
+    if args.len > 2 then return objRef.trySudo(args[1], args[2]) else return "Usage: sudo [username] [password]"
 end function
 
 ShellHandler.inputMap["connect"] = function(objRef, args)
-    if args.len > 4 then return objRef.connectService(ip, port, username, userPass) else return "Usage: connect [ip] [port] [username] [password]"
+    if args.len > 4 then return objRef.connectService(args[1], args[2].to_int, args[3], args[4]) else return "Usage: connect [ip] [port] [username] [password]"
 end function
 
 ShellHandler.getObject = function()
@@ -59,9 +60,7 @@ end function
 ShellHandler.getFile = function(fileName)
     remotePath = self.fileObject.path + "/" + fileName
     result = self.shellObject.scp(remotePath, "/root/Loot/", session.vexxed["homeShell"])
-    if result != true then
-        print("Error downloading file: " + result)
-    end if
+    if result != true then return "Error downloading file: " + result
 end function
 
 // Uploads specified file to remote Shell.

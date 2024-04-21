@@ -9,45 +9,38 @@ ComputerHandler.classID = "ComputerHandler"
 
 ComputerHandler.displayID = "Computer"
 
+ComputerHandler.inputMap = new FileHandler.inputMap // Don't just access the prototype, create a new object. Learned that the hard way :(
+
 ComputerHandler.inputMap["ps"] = function(objRef, args)
     return objRef.getProcesses
 end function
 
-ComputerHandler.inputMap["kill"] = function(objRef, args)
-    if args.len > 1 then pid = args[1] else pid = 0
+ComputerHandler.inputMap["ifconfig"] = function(objRef, args)
+    return objRef.netInfo
+end function
 
-    return objRef.closeProcess(pid.to_int)
+ComputerHandler.inputMap["kill"] = function(objRef, args)
+    if args.len > 1 then return objRef.closeProcess(args[1].to_int) else return "Usage: kill [pid]"
 end function
 
 ComputerHandler.inputMap["useradd"] = function(objRef, args)
-    if args.len > 1 then username = args[1] else username = "user"
-
-    return objRef.userAdd(username, "secretpassword")
+    if args.len > 2 then return objRef.userAdd(args[1], args[2]) else return "Usage: useradd [username] [password]"
 end function
 
 ComputerHandler.inputMap["passwd"] = function(objRef, args)
-    if args.len > 1 then username = args[1] else username = "user"
-    if args.len > 2 then pass = args[2] else pass = "secretpasswd"
-
-    return objRef.changePass(username, pass)
+    if args.len > 2 then return objRef.changePass(args[1], args[2]) else return "Usage: passwd [username] [password]"
 end function
 
 ComputerHandler.inputMap["touch"] = function(objRef, args)
-    if args.len > 1 then fileName = args[1] else fileName = "file.txt"
-
-    return objRef.createFile(objRef.fileObject.path, fileName)
+    if args.len > 1 then return objRef.createFile(objRef.fileObject.path, args[1]) else return "Usage: touch [filename]"
 end function
 
 ComputerHandler.inputMap["mkdir"] = function(objRef, args)
-    if args.len > 1 then folder = args[1] else folder = "dir"
-
-    return objRef.createFolder(objRef.fileObject.path, folder)
+    if args.len > 1 then return objRef.createFolder(objRef.fileObject.path, args[1]) else return "Usage: mkdir [foldername]"
 end function
 
 ComputerHandler.inputMap["iwlist"] = function(objRef, args)
-    if args.len > 1 then interface = args[1] else interface = "wlan0"
-
-    return objRef.getWiFiObjects(interface)
+    if args.len > 1 then return objRef.getWiFiObjects(args[1]) else return "Usage: iwlist [interface]"
 end function
 
 ComputerHandler.getObject = function()
@@ -91,6 +84,10 @@ end function
 ComputerHandler.createFolder = function(path, folder)
     result = self.computerObject.create_folder(path, folder)
     if result != true then return ComputerMkdirError.create(path, folder, result)
+end function
+
+ComputerHandler.netInfo = function()
+    return format_columns("Local IP: " + self.getLANIP + "\nPublic IP: " + self.getPubIP + "\nActive card: " + self.getActiveCard + "\nInterfaces: " + self.getInterfaces)
 end function
 
 ComputerHandler.getActiveCard = function()

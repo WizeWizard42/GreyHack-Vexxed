@@ -50,14 +50,13 @@ end function
 Engine.promptUser = function()
     while true
         input = user_input("[" + session.vexxed["session"].currHandler.displayID + ":" + session.vexxed["session"].currHandler.getPubIP + ":" + session.vexxed["session"].currHandler.getLANIP + "] " + session.vexxed["session"].currHandler.fileObject.path + "# ")
-        self.handleInput(input)
+        self.handleInput(input.trim)
     end while
 end function
 
 Engine.handleInput = function(input)
-    if input == "exit" then
-        exit("Exiting program.")
-    end if
+    if input == "exit" then exit("Exiting program.")
+    if input == "clear" then clear_screen
 
     input = input.split("\|")
     for command in input
@@ -81,7 +80,7 @@ Engine.handleInput = function(input)
             for i in session.indexes
                 print(session[i])
             end for
-        end if 
+        end if
     end for
 end function
 

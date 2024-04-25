@@ -1042,6 +1042,17 @@ end function
 // Enumerator class. Provides helpful methods for enumerating targets. Nothing much for now, but still good to be modular.
 Enumerator = {}
 
+Enumerator.whoIs = function(domain)
+    address = ""
+    if not is_valid_ip(domain) then 
+        address = nslookup(domain)
+        print("Address: " + address)
+    else
+        address = domain
+    end if
+    print(whois(address))
+end function
+
 Enumerator.fullEnumerate = function(ip)
     print("whois " + ip + ":")
     print(whois(ip))

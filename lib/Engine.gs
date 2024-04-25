@@ -66,6 +66,10 @@ Engine.handleInput = function(input)
         if command[0] == "enumerate" and command.len == 2 then
             Enumerator.fullEnumerate(command[1])
         end if
+
+        if command[0] == "whois" and command.len == 2 then
+            Enumerator.whoIs(command[1])
+        end if
         
 		if command[0] == "revshell" then
 			RevShellServer.handleInput(command[1:])

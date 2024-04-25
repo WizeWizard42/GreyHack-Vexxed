@@ -1209,10 +1209,10 @@ end function
 Exploiter.saveResult = function()
     c = session.vexxed["homeShell"].host_computer
 
-    if not c.File("/root/payloads.db") then
-        c.touch("/root", "payloads.db")
+    if not c.File("/root/Vexxed/payloads.db") then
+        c.touch("/root/Vexxed", "payloads.db")
     end if
-    database_file = c.File("/root/payloads.db")
+    database_file = c.File("/root/Vexxed/payloads.db")
 
 	result_string = ""
 
@@ -1235,10 +1235,10 @@ end function
 Exploiter.loadResult = function()
 c = session.vexxed["homeShell"].host_computer
 
-if not c.File("/root/payloads.db") then
+if not c.File("/root/Vexxed/payloads.db") then
 	self.scanResult = {}
 else
-	content = c.File("/root/payloads.db").get_content
+	content = c.File("/root/Vexxed/payloads.db").get_content
 
 	if content.len == 0 then
 		self.scanResult = {}
@@ -1303,7 +1303,7 @@ Exploiter.printVulns = function(lib_id)
 	print("Listing stored vulns for: " + lib_id)
 	info = ""
 	for i in range(0, self.resultObjects[lib_id].len - 1, 1)
-		info = info + (str(i) + ": " + self.resultObjects[lib_id][i].getPerms + "    " + typeof(self.resultObjects[lib_id][i].getObject).color("blue") + "    " + self.resultObjects[lib_id][i].getLANIP + "\n")
+		info = info + (str(i) + ": " + self.resultObjects[lib_id][i].getPerms + "    " + typeof(self.resultObjects[lib_id][i].getObject) + "    " + self.resultObjects[lib_id][i].getLANIP + "\n")
 	end for
 	print(format_columns(info))
 end function
@@ -1479,6 +1479,10 @@ Engine.handleInput = function(input)
 
         if command[0] == "enumerate" and command.len == 2 then
             Enumerator.fullEnumerate(command[1])
+        end if
+
+        if command[0] == "whois" and command.len == 2 then
+            Enumerator.whoIs(command[1])
         end if
         
 		if command[0] == "revshell" then

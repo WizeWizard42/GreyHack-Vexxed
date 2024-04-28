@@ -87,7 +87,7 @@ ComputerHandler.createFolder = function(path, folder)
 end function
 
 ComputerHandler.netInfo = function()
-    return format_columns("Local IP: " + self.getLANIP + "\nPublic IP: " + self.getPubIP + "\nActive card: " + self.getActiveCard + "\nInterfaces: " + self.getInterfaces)
+    return "Local IP: " + self.getLANIP + "\nPublic IP: " + self.getPubIP + "\nActive card: " + self.getActiveCard + "\nInterfaces:\n" + self.getInterfaces
 end function
 
 ComputerHandler.getActiveCard = function()

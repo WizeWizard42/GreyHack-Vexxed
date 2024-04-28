@@ -1,14 +1,4 @@
-metaxploit = include_lib(current_path + "/metaxploit.so")
-if not metaxploit then metaxploit = include_lib("/lib/metaxploit.so")
-if not metaxploit then exit("Could not import metaxploit. Exiting.")
-
-crypto = include_lib(current_path + "/crypto.so")
-if not crypto then crypto = include_lib("/lib/crypto.so")
-if not crypto then print("Could not import crypto. Continuing.")
-
-session = @get_custom_object
-
-////////////////////////////////////////////////////////////////////////////////////
+globals.session = @get_custom_object
 
 // File: TypeExtensions.gs
 //LinQ lib functionality for greyscript
@@ -411,6 +401,8 @@ SessionManager.currHandler = null
 
 SessionManager.handlerStack = []
 
+SessionManager.sessionStack = []
+
 SessionManager.currLib = {}
 
 SessionManager.inputMap = {}
@@ -462,19 +454,52 @@ SessionManager.setCurrLib = function(val)
 end function
 
 SessionManager.initSession = function()
+    globals.aptclient = include_lib(current_path + "/aptclient.so")
+    if not aptclient then exit("Could not import aptclient. Exiting.")
+
+    // Update and install metaxploit.so and crypto.so with aptclient
+    aptclient.update
+    if aptclient.check_upgrade(current_path + "/metaxploit.so") == true then aptclient.install("metaxploit.so", current_path)
+    if aptclient.check_upgrade(current_path + "/crypto.so") == true then aptclient.install("crypto.so", current_path)
+    globals.metaxploit = include_lib(current_path + "/metaxploit.so")
+    globals.crypto = include_lib(current_path + "/crypto.so")
+    if not metaxploit then exit("Could not import metaxploit. Exiting.")
+    if not crypto then exit("Could not import crypto. Exiting.")
+
     session.vexxed = {}
     session.vexxed["session"] = self
     session.vexxed["exploiter"] = globals.Exploiter
     session.vexxed["homeShell"] = get_shell
     session.vexxed["remoteShell"] = get_shell
     session.vexxed["homeMetax"] = metaxploit
+    session.vexxed["revMetax"] = metaxploit
     session.vexxed["remoteMetax"] = metaxploit
     session.vexxed["homeCrypto"] = crypto
 end function
 
 SessionManager.importSession = function()
+    globals.metaxploit = include_lib(current_path + "/metaxploit.so")
+    if not metaxploit then exit("Could not import metaxploit. Exiting.")
+
+    sessionLayer = {}
+    sessionLayer["remoteMetax"] = session.vexxed["remoteMetax"]
+    sessionLayer["remoteShell"] = session.vexxed["remoteShell"]
+    self.sessionStack.push(sessionLayer)
+
     session.vexxed["remoteMetax"] = metaxploit
     session.vexxed["remoteShell"] = get_shell
+end function
+
+SessionManager.exitLayer = function()
+    if self.sessionStack.len == 0 then
+        print("No previous layer to return to. Returning to terminal.")
+        return
+    end if
+    
+    // Restore the previous layer's session objects
+    sessionLayer = self.sessionStack.pop()
+    session.vexxed["remoteMetax"] = sessionLayer["remoteMetax"]
+    session.vexxed["remoteShell"] = sessionLayer["remoteShell"]
 end function
 
 SessionManager.handleInput = function(input)
@@ -894,7 +919,7 @@ ComputerHandler.createFolder = function(path, folder)
 end function
 
 ComputerHandler.netInfo = function()
-    return format_columns("Local IP: " + self.getLANIP + "\nPublic IP: " + self.getPubIP + "\nActive card: " + self.getActiveCard + "\nInterfaces: " + self.getInterfaces)
+    return "Local IP: " + self.getLANIP + "\nPublic IP: " + self.getPubIP + "\nActive card: " + self.getActiveCard + "\nInterfaces:\n" + self.getInterfaces
 end function
 
 ComputerHandler.getActiveCard = function()
@@ -1055,9 +1080,11 @@ end function
 
 Enumerator.fullEnumerate = function(ip)
     print("whois " + ip + ":")
-    print(whois(ip))
-    
+    Enumerator.whoIs(ip)
+
+    if not is_valid_ip(ip) then ip = nslookup(ip)
     router = get_router(ip)
+    if router == null then return "Router not found."
     print("\nRouter LAN address: " + router.local_ip)
     print("Router BSSID: " + router.bssid_name)
     print("Router ESSID: " + router.essid_name)
@@ -1341,12 +1368,12 @@ RevShellServer.inputMap["list"] = function(objRef, args)
 end function
 
 RevShellServer.inputMap["refresh"] = function(objRef, args)
-    objRef.updateClients(get_custom_object.vexxed["remoteMetax"])
+    objRef.updateClients(get_custom_object.vexxed["revMetax"])
 end function
 
 RevShellServer.inputMap["use"] = function(objRef, args)
     if args.len < 2 then
-        print("Usage: use <index>")
+        print("Usage: revshell use [index]")
         return
     end if
 
@@ -1361,11 +1388,15 @@ end function
 
 RevShellServer.inputMap["connect"] = function(objRef, args)
     if args.len < 3 then
-        print("Usage: connect <ip> <port> <proc=Terminal.exe>")
+        print("Usage: revshell connect [ip] [port] [proc=Terminal.exe]")
         return
     end if
     if not args.hasIndex(3) then args.push("Terminal.exe")
     objRef.startClient(args[1], args[2].to_int, args[3])
+end function
+
+RevShellServer.inputMap["setlib"] = function(objRef, args)
+    objRef.setServerLib
 end function
 
 RevShellServer.getClients = function(metaxLib)
@@ -1399,6 +1430,11 @@ RevShellServer.setActiveClient = function(index, shellObj)
     end if
 end function
 
+RevShellServer.setServerLib = function()
+    session.vexxed["revMetax"] = session.vexxed["remoteMetax"]
+    print("Server library set to remote Metaxploit.")
+end function
+
 RevShellServer.installServer = function()
     session.vexxed["session"].currHandler.putFile("/root/VulnLibs/librshell.so")
     session.vexxed["session"].currHandler.moveFile("librshell.so", "/lib/", "librshell.so")
@@ -1415,7 +1451,7 @@ RevShellServer.installServer = function()
 end function
 
 RevShellServer.startClient = function(ip, port, proc)
-    session.vexxed["remoteMetax"].rshell_client(ip, port, proc)
+    session.vexxed["revMetax"].rshell_client(ip, port, proc)
 end function
 
 RevShellServer.handleInput = function(input)
@@ -1446,7 +1482,7 @@ end function
 Engine.loadSession = function()
     if get_custom_object.hasIndex("vexxed") then
         print("Session found. Importing objects...")
-        SessionManager.importSession
+        session.vexxed["session"].importSession
         return
     end if
 
@@ -1474,19 +1510,25 @@ end function
 
 Engine.promptUser = function()
     while true
-        input = user_input("[" + session.vexxed["session"].currHandler.displayID + ":" + session.vexxed["session"].currHandler.getPubIP + ":" + session.vexxed["session"].currHandler.getLANIP + "] " + session.vexxed["session"].currHandler.fileObject.path + "# ")
+        input = user_input("[" + session.vexxed["session"].currHandler.displayID + ":" + session.vexxed["session"].currHandler.getPubIP + ":" + session.vexxed["session"].currHandler.getLANIP + " " + session.vexxed["session"].sessionStack.len + "] " + session.vexxed["session"].currHandler.fileObject.path + "# ")
         self.handleInput(input.trim)
     end while
 end function
 
 Engine.handleInput = function(input)
-    if input == "exit" then exit("Exiting program.")
+    if input == "exit" then
+        session.vexxed["session"].exitLayer
+        exit("Exiting...")
+    end if
     if input == "clear" then clear_screen
 
     input = input.split("\|")
     for command in input
         command = command.trim.split(" ")
         command = command.wherenot("len", 0) // Remove empty strings
+
+        // Check if command is empty
+        if command.len == 0 then continue
 
         if command[0] == "enumerate" and command.len == 2 then
             Enumerator.fullEnumerate(command[1])

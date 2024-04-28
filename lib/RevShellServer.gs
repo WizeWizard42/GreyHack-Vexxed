@@ -12,12 +12,12 @@ RevShellServer.inputMap["list"] = function(objRef, args)
 end function
 
 RevShellServer.inputMap["refresh"] = function(objRef, args)
-    objRef.updateClients(get_custom_object.vexxed["remoteMetax"])
+    objRef.updateClients(get_custom_object.vexxed["revMetax"])
 end function
 
 RevShellServer.inputMap["use"] = function(objRef, args)
     if args.len < 2 then
-        print("Usage: use <index>")
+        print("Usage: revshell use [index]")
         return
     end if
 
@@ -32,11 +32,15 @@ end function
 
 RevShellServer.inputMap["connect"] = function(objRef, args)
     if args.len < 3 then
-        print("Usage: connect <ip> <port> <proc=Terminal.exe>")
+        print("Usage: revshell connect [ip] [port] [proc=Terminal.exe]")
         return
     end if
     if not args.hasIndex(3) then args.push("Terminal.exe")
     objRef.startClient(args[1], args[2].to_int, args[3])
+end function
+
+RevShellServer.inputMap["setlib"] = function(objRef, args)
+    objRef.setServerLib
 end function
 
 RevShellServer.getClients = function(metaxLib)
@@ -70,6 +74,11 @@ RevShellServer.setActiveClient = function(index, shellObj)
     end if
 end function
 
+RevShellServer.setServerLib = function()
+    session.vexxed["revMetax"] = session.vexxed["remoteMetax"]
+    print("Server library set to remote Metaxploit.")
+end function
+
 RevShellServer.installServer = function()
     session.vexxed["session"].currHandler.putFile("/root/VulnLibs/librshell.so")
     session.vexxed["session"].currHandler.moveFile("librshell.so", "/lib/", "librshell.so")
@@ -86,7 +95,7 @@ RevShellServer.installServer = function()
 end function
 
 RevShellServer.startClient = function(ip, port, proc)
-    session.vexxed["remoteMetax"].rshell_client(ip, port, proc)
+    session.vexxed["revMetax"].rshell_client(ip, port, proc)
 end function
 
 RevShellServer.handleInput = function(input)

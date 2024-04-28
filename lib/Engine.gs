@@ -21,7 +21,7 @@ end function
 Engine.loadSession = function()
     if get_custom_object.hasIndex("vexxed") then
         print("Session found. Importing objects...")
-        SessionManager.importSession
+        session.vexxed["session"].importSession
         return
     end if
 
@@ -49,19 +49,25 @@ end function
 
 Engine.promptUser = function()
     while true
-        input = user_input("[" + session.vexxed["session"].currHandler.displayID + ":" + session.vexxed["session"].currHandler.getPubIP + ":" + session.vexxed["session"].currHandler.getLANIP + "] " + session.vexxed["session"].currHandler.fileObject.path + "# ")
+        input = user_input("[" + session.vexxed["session"].currHandler.displayID + ":" + session.vexxed["session"].currHandler.getPubIP + ":" + session.vexxed["session"].currHandler.getLANIP + " " + session.vexxed["session"].sessionStack.len + "] " + session.vexxed["session"].currHandler.fileObject.path + "# ")
         self.handleInput(input.trim)
     end while
 end function
 
 Engine.handleInput = function(input)
-    if input == "exit" then exit("Exiting program.")
+    if input == "exit" then
+        session.vexxed["session"].exitLayer
+        exit("Exiting...")
+    end if
     if input == "clear" then clear_screen
 
     input = input.split("\|")
     for command in input
         command = command.trim.split(" ")
         command = command.wherenot("len", 0) // Remove empty strings
+
+        // Check if command is empty
+        if command.len == 0 then continue
 
         if command[0] == "enumerate" and command.len == 2 then
             Enumerator.fullEnumerate(command[1])

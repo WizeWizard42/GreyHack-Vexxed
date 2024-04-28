@@ -14,9 +14,11 @@ end function
 
 Enumerator.fullEnumerate = function(ip)
     print("whois " + ip + ":")
-    print(whois(ip))
-    
+    Enumerator.whoIs(ip)
+
+    if not is_valid_ip(ip) then ip = nslookup(ip)
     router = get_router(ip)
+    if router == null then return "Router not found."
     print("\nRouter LAN address: " + router.local_ip)
     print("Router BSSID: " + router.bssid_name)
     print("Router ESSID: " + router.essid_name)

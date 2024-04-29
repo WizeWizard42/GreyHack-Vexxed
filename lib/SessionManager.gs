@@ -86,23 +86,14 @@ SessionManager.initSession = function()
     session.vexxed["homeCrypto"] = crypto
 end function
 
-<<<<<<< HEAD
 SessionManager.importSession = function() // Call this method with SessionManager, not cob reference. Cob reference is relative to the home system!!!
-=======
-SessionManager.importSession = function()
->>>>>>> 65f54aa1ed1a837a078de6fd9c8b5b9792980e87
     globals.metaxploit = include_lib(current_path + "/metaxploit.so")
     if not metaxploit then exit("Could not import metaxploit. Exiting.")
 
     sessionLayer = {}
     sessionLayer["remoteMetax"] = session.vexxed["remoteMetax"]
     sessionLayer["remoteShell"] = session.vexxed["remoteShell"]
-<<<<<<< HEAD
     session.vexxed["session"].sessionStack.push(sessionLayer)
-=======
-    self.sessionStack.push(sessionLayer)
->>>>>>> 65f54aa1ed1a837a078de6fd9c8b5b9792980e87
-
     session.vexxed["remoteMetax"] = metaxploit
     session.vexxed["remoteShell"] = get_shell
 end function

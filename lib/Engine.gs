@@ -21,7 +21,7 @@ end function
 Engine.loadSession = function()
     if get_custom_object.hasIndex("vexxed") then
         print("Session found. Importing objects...")
-        session.vexxed["session"].importSession
+        SessionManager.importSession
         return
     end if
 

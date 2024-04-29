@@ -58,7 +58,7 @@ SessionManager.setCurrLib = function(val)
     self.currLib = val
 end function
 
-SessionManager.initSession = function()
+SessionManager.initSession = function() // Call this method with SessionManager, not cob reference. Cob reference is relative to the home system!!!
     globals.aptclient = include_lib(current_path + "/aptclient.so")
     if not aptclient then exit("Could not import aptclient. Exiting.")
 
@@ -82,14 +82,14 @@ SessionManager.initSession = function()
     session.vexxed["homeCrypto"] = crypto
 end function
 
-SessionManager.importSession = function()
+SessionManager.importSession = function() // Call this method with SessionManager, not cob reference. Cob reference is relative to the home system!!!
     globals.metaxploit = include_lib(current_path + "/metaxploit.so")
     if not metaxploit then exit("Could not import metaxploit. Exiting.")
 
     sessionLayer = {}
     sessionLayer["remoteMetax"] = session.vexxed["remoteMetax"]
     sessionLayer["remoteShell"] = session.vexxed["remoteShell"]
-    self.sessionStack.push(sessionLayer)
+    session.vexxed["session"].sessionStack.push(sessionLayer)
 
     session.vexxed["remoteMetax"] = metaxploit
     session.vexxed["remoteShell"] = get_shell

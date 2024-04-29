@@ -21,7 +21,11 @@ end function
 Engine.loadSession = function()
     if get_custom_object.hasIndex("vexxed") then
         print("Session found. Importing objects...")
+<<<<<<< HEAD
         SessionManager.importSession
+=======
+        session.vexxed["session"].importSession
+>>>>>>> 65f54aa1ed1a837a078de6fd9c8b5b9792980e87
         return
     end if
 
@@ -41,7 +45,7 @@ end function
 
 Engine.promptPassword = function()
     input = user_input("Password: ", 1)
-	if input != "qr8HTwSQJkG14Ij9YQOFA6d1!z2$uj4q" then
+	if input != "" then // Put the password you want here
 		// TODO: Alert me when incorrect password is entered, maybe take other measures
 		exit("Wrong password, nice try.")
 	end if

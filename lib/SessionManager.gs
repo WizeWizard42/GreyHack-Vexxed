@@ -59,11 +59,7 @@ SessionManager.setCurrLib = function(val)
     self.currLib = val
 end function
 
-<<<<<<< HEAD
 SessionManager.initSession = function() // Call this method with SessionManager, not cob reference. Cob reference is relative to the home system!!!
-=======
-SessionManager.initSession = function()
->>>>>>> 65f54aa1ed1a837a078de6fd9c8b5b9792980e87
     globals.aptclient = include_lib(current_path + "/aptclient.so")
     if not aptclient then exit("Could not import aptclient. Exiting.")
 

@@ -23,11 +23,12 @@ SessionManager.inputMap["pop"] = function(objRef, args)
 end function
 
 SessionManager.inputMap["hstack"] = function(objRef, args)
-    for handler in objRef.handlerStack
-        if handler == objRef.currHandler then
-            print(objRef.handlerStack.indexOf(handler) + "* " + handler.classID + ": " + handler.getPubIP + " " + handler.getLANIP)
+    for i in range(0, objRef.handlerStack.len - 1)
+        handler = objRef.handlerStack[i]
+        if handler.UID == objRef.currHandler.UID then
+            print(i + "* " + handler.classID + ": " + handler.getPubIP + " " + handler.getLANIP)
         else
-            print(objRef.handlerStack.indexOf(handler) + " " + handler.classID + ": " + handler.getPubIP + " " + handler.getLANIP)
+            print(i + " " + handler.classID + ": " + handler.getPubIP + " " + handler.getLANIP)
         end if
     end for
 end function
@@ -68,8 +69,8 @@ SessionManager.initSession = function()
 
     // Update and install metaxploit.so and crypto.so with aptclient
     aptclient.update
-    if aptclient.check_upgrade(current_path + "/metaxploit.so") == true then aptclient.install("metaxploit.so", current_path)
-    if aptclient.check_upgrade(current_path + "/crypto.so") == true then aptclient.install("crypto.so", current_path)
+    if get_shell.host_computer.File(current_path + "/metaxploit.so") == null or aptclient.check_upgrade(current_path + "/metaxploit.so") == true then aptclient.install("metaxploit.so", current_path)
+    if get_shell.host_computer.File(current_path + "/crypto.so") == null or aptclient.check_upgrade(current_path + "/crypto.so") == true then aptclient.install("crypto.so", current_path)
     globals.metaxploit = include_lib(current_path + "/metaxploit.so")
     globals.crypto = include_lib(current_path + "/crypto.so")
     if not metaxploit then exit("Could not import metaxploit. Exiting.")

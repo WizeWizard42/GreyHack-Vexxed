@@ -14,7 +14,7 @@ Engine.startEngine = function()
     shell = new ShellHandler
     shell.updateShellObject(get_shell)
     session.vexxed["session"].addHandler(shell)
-	RevShellServer.updateClients(session.vexxed["remoteMetax"])
+	RevShellServer.updateClients(session.vexxed["revMetax"])
     self.promptUser
 end function
 

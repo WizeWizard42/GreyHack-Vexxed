@@ -10,6 +10,8 @@ FileHandler.classID = "FileHandler"
 
 FileHandler.displayID = "File"
 
+FileHandler.UID = null
+
 FileHandler.filePath = ["var"]
 
 // Used in Handler's handleInput. Maps user's input in terminal to their respective Handler methods.
@@ -77,6 +79,7 @@ end function
 // Sets stored File object to passed object, and updates stored path.
 FileHandler.updateFileObject = function(fileObject)
     self.fileObject = fileObject
+    self.genUID
     self.updateFilePath
 end function
 
@@ -308,6 +311,10 @@ FileHandler.logWipe = function()
     if result isa GenericError then return result
     self.writeFile("fstab", "") 
     return "Logs wiped."
+end function
+
+FileHandler.genUID = function()
+    self.UID = md5(str(rnd + rnd + rnd + rnd)) // Random enough for a UID.
 end function
 
 // As inputMap is updated in better objects, more commands can be used

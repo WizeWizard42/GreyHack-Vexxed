@@ -418,11 +418,12 @@ SessionManager.inputMap["pop"] = function(objRef, args)
 end function
 
 SessionManager.inputMap["hstack"] = function(objRef, args)
-    for handler in objRef.handlerStack
-        if handler == objRef.currHandler then
-            print(objRef.handlerStack.indexOf(handler) + "* " + handler.classID + ": " + handler.getPubIP + " " + handler.getLANIP)
+    for i in range(0, objRef.handlerStack.len - 1)
+        handler = objRef.handlerStack[i]
+        if handler.UID == objRef.currHandler.UID then
+            print(i + "* " + handler.classID + ": " + handler.getPubIP + " " + handler.getLANIP)
         else
-            print(objRef.handlerStack.indexOf(handler) + " " + handler.classID + ": " + handler.getPubIP + " " + handler.getLANIP)
+            print(i + " " + handler.classID + ": " + handler.getPubIP + " " + handler.getLANIP)
         end if
     end for
 end function
@@ -459,8 +460,8 @@ SessionManager.initSession = function() // Call this method with SessionManager,
 
     // Update and install metaxploit.so and crypto.so with aptclient
     aptclient.update
-    if aptclient.check_upgrade(current_path + "/metaxploit.so") == true then aptclient.install("metaxploit.so", current_path)
-    if aptclient.check_upgrade(current_path + "/crypto.so") == true then aptclient.install("crypto.so", current_path)
+    if get_shell.host_computer.File(current_path + "/metaxploit.so") == null or aptclient.check_upgrade(current_path + "/metaxploit.so") == true then aptclient.install("metaxploit.so", current_path)
+    if get_shell.host_computer.File(current_path + "/crypto.so") == null or aptclient.check_upgrade(current_path + "/crypto.so") == true then aptclient.install("crypto.so", current_path)
     globals.metaxploit = include_lib(current_path + "/metaxploit.so")
     globals.crypto = include_lib(current_path + "/crypto.so")
     if not metaxploit then exit("Could not import metaxploit. Exiting.")
@@ -520,6 +521,8 @@ FileHandler.fileObject = null // Underlying File object.
 FileHandler.classID = "FileHandler"
 
 FileHandler.displayID = "File"
+
+FileHandler.UID = null
 
 FileHandler.filePath = ["var"]
 
@@ -588,6 +591,7 @@ end function
 // Sets stored File object to passed object, and updates stored path.
 FileHandler.updateFileObject = function(fileObject)
     self.fileObject = fileObject
+    self.genUID
     self.updateFilePath
 end function
 
@@ -819,6 +823,10 @@ FileHandler.logWipe = function()
     if result isa GenericError then return result
     self.writeFile("fstab", "") 
     return "Logs wiped."
+end function
+
+FileHandler.genUID = function()
+    self.UID = md5(str(rnd + rnd + rnd + rnd)) // Random enough for a UID.
 end function
 
 // As inputMap is updated in better objects, more commands can be used
@@ -1475,7 +1483,7 @@ Engine.startEngine = function()
     shell = new ShellHandler
     shell.updateShellObject(get_shell)
     session.vexxed["session"].addHandler(shell)
-	RevShellServer.updateClients(session.vexxed["remoteMetax"])
+	RevShellServer.updateClients(session.vexxed["revMetax"])
     self.promptUser
 end function
 

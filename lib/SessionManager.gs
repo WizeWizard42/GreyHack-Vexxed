@@ -81,6 +81,7 @@ SessionManager.initSession = function() // Call this method with SessionManager,
     session.vexxed["revMetax"] = metaxploit
     session.vexxed["remoteMetax"] = metaxploit
     session.vexxed["homeCrypto"] = crypto
+    session.vexxed["remoteCrypto"] = crypto
 end function
 
 SessionManager.importSession = function() // Call this method with SessionManager, not cob reference. Cob reference is relative to the home system!!!
@@ -89,9 +90,11 @@ SessionManager.importSession = function() // Call this method with SessionManage
 
     sessionLayer = {}
     sessionLayer["remoteMetax"] = session.vexxed["remoteMetax"]
+    sessionLayer["remoteCrypto"] = session.vexxed["remoteCrypto"]
     sessionLayer["remoteShell"] = session.vexxed["remoteShell"]
     session.vexxed["session"].sessionStack.push(sessionLayer)
     session.vexxed["remoteMetax"] = metaxploit
+    session.vexxed["remoteCrypto"] = crypto
     session.vexxed["remoteShell"] = get_shell
 end function
 
@@ -104,6 +107,7 @@ SessionManager.exitLayer = function()
     // Restore the previous layer's session objects
     sessionLayer = self.sessionStack.pop()
     session.vexxed["remoteMetax"] = sessionLayer["remoteMetax"]
+    session.vexxed["remoteCrypto"] = sessionLayer["remoteCrypto"]
     session.vexxed["remoteShell"] = sessionLayer["remoteShell"]
 end function
 

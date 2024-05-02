@@ -1,6 +1,7 @@
 import_code("/lib/ComputerHandler.gs")
 
 // ShellHandler class. Inherits ComputerHandler and implements ready-made methods for stored Shell object.
+// Use global methods when working with the internal Shell object.
 ShellHandler = new ComputerHandler
 
 ShellHandler.shellObject = null
@@ -48,62 +49,55 @@ end function
 // Sets stored Shell object to passed object, and calls updateComputerObject with respective Computer.
 ShellHandler.updateShellObject = function(shellObject)
     self.shellObject = shellObject
-    self.updateComputerObject(self.shellObject.host_computer)
+    self.updateComputerObject(host_computer(self.shellObject))
 end function
 
 // Drops to a shell, self-explanatory.
 ShellHandler.dropShell = function()
-    self.shellObject.start_terminal
+    start_terminal(self.shellObject)
 end function
 
 // Downloads specified file to local Shell.
 ShellHandler.getFile = function(fileName)
     remotePath = self.fileObject.path + "/" + fileName
-    result = self.shellObject.scp(remotePath, "/root/Loot/", session.vexxed["homeShell"])
+    result = scp(self.shellObject, remotePath, "/root/Loot/", session.vexxed["homeShell"])
     if result != true then return "Error downloading file: " + result
 end function
 
 // Uploads specified file to remote Shell.
 ShellHandler.putFile = function(filePath)
-    result = session.vexxed["homeShell"].scp(filePath, self.fileObject.path, self.shellObject)
-    if result != true then
-        print("Error uploading file: " + result)
-    end if
+    result = scp(session.vexxed["homeShell"], filePath, self.fileObject.path, self.shellObject)
+    if result != true then return "Error uploading file: " + result
 end function
 
 ShellHandler.trySudo = function(userName, userPass)
-
     if userName.trim.len == 0 and userPass.trim.len == 0 then result = get_shell else result = get_shell(userName, userPass)
-    if not result then
-        print("User/pass combo incorrect. Remember, this only works on the current remoteShell.")
-        return
-    end if
+    if not result then return "User/pass combo incorrect. Remember, this only works on the current remoteShell."
 
     shell = new ShellHandler
     shell.updateShellObject(result)
     session.vexxed["session"].addHandler(shell)
-    session.vexxed["remoteShell"] = result
 end function
 
 ShellHandler.buildFile = function(srcPath, binPath, canImport)
-    result = self.shellObject.build(srcPath, binPath, canImport)
+    result = build(self.shellObject, srcPath, binPath, canImport)
     if result != "" then
         print("Error building file: " + result)
     end if
 end function
 
 ShellHandler.launchFile = function(filePath, args)
-	result = self.shellObject.launch(filePath, args)
+	result = launch(self.shellObject, filePath, args)
 	print("Successfuly launched: " + result)
 end function
 
 ShellHandler.connectService = function(ip, port, username, userPass)
-    result = self.shellObject.connect_service(ip, port, username, userPass)
+    result = connect_service(self.shellObject, ip, port, username, userPass)
     if result isa string then 
         print("Error connecting to service: " + result)
     end if
 
-    if typeof(result) == "shell" then
+    if typeof(result) == "shell" or typeof(result) == "ftpShell" then // ftpShell acts as a shell if global methods are used
         shell = new ShellHandler
         shell.updateShellObject(result)
         session.vexxed["session"].addHandler(shell)

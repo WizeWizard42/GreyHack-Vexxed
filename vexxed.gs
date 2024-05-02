@@ -481,6 +481,7 @@ end function
 
 SessionManager.importSession = function() // Call this method with SessionManager, not cob reference. Cob reference is relative to the home system!!!
     globals.metaxploit = include_lib(current_path + "/metaxploit.so")
+    globals.crypto = include_lib(current_path + "/crypto.so")
     if not metaxploit then exit("Could not import metaxploit. Exiting.")
     if not crypto then exit("Could not import crypto. Exiting.")
 

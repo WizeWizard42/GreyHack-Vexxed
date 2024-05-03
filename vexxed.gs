@@ -666,14 +666,16 @@ end function
 
 // Returns content of specified file. Needs to be in current directory.
 FileHandler.readFile = function(fileName)
-    if not self.checkFile(fileName) then return FileNotFoundError.create(fileName)
-    result = self.fileObject.get_files.first("name", fileName).get_content
+    file = self.fileObject.get_files.first("name", fileName)
+    if not file then return FileNotFoundError.create(fileName)
+    result = file.get_content
     if not result then return FileReadError.create(fileName) else return result
 end function
 
 FileHandler.writeFile = function(fileName, content)
-    if not self.checkFile(fileName) then return FileNotFoundError.create(fileName)
-    result = self.fileObject.get_files.first("name", fileName).set_content(content)
+    file = self.fileObject.get_files.first("name", fileName)
+    if not file then return FileNotFoundError.create(fileName)
+    result = file.set_content(content)
     if result != true then return FileWriteError.create(fileName, result) else return "Content written."
 end function
 

@@ -1007,7 +1007,8 @@ ShellHandler.inputMap["sudo"] = function(objRef, args)
 end function
 
 ShellHandler.inputMap["connect"] = function(objRef, args)
-    if args.len > 4 then return objRef.connectService(args[1], args[2].to_int, args[3], args[4]) else return "Usage: connect [ip] [port] [username] [password]"
+    if args.len > 5 then return objRef.connectService(args[1], args[2].to_int, args[3], args[4], args[5].to_int)
+    if args.len > 4 then return objRef.connectService(args[1], args[2].to_int, args[3], args[4]) else return "Usage: connect [ip] [port] [username] [password] [isFTP=0]"
 end function
 
 ShellHandler.getObject = function()
@@ -1059,13 +1060,14 @@ ShellHandler.launchFile = function(filePath, args)
 	print("Successfuly launched: " + result)
 end function
 
-ShellHandler.connectService = function(ip, port, username, userPass)
-    result = connect_service(self.shellObject, ip, port, username, userPass)
+ShellHandler.connectService = function(ip, port, username, userPass, isFTP = false)
+    if isFTP then service = "ftp" else service = "ssh"
+    result = connect_service(self.shellObject, ip, port, username, userPass, service)
     if result isa string then 
         print("Error connecting to service: " + result)
     end if
 
-    if typeof(result) == "shell" or typeof(result) == "ftpShell" then // ftpShell acts as a shell if global methods are used
+    if typeof(result) == "shell" or typeof(result) == "ftpshell" then // ftpShell acts as a shell if global methods are used
         shell = new ShellHandler
         shell.updateShellObject(result)
         session.vexxed["session"].addHandler(shell)

@@ -38,6 +38,10 @@ ShellHandler.inputMap["sudo"] = function(objRef, args)
     if args.len > 2 then return objRef.trySudo(args[1], args[2]) else return "Usage: sudo [username] [password]"
 end function
 
+ShellHandler.inputMap["jump"] = function(objRef, args)
+    objRef.jumpTo
+end function
+
 ShellHandler.inputMap["connect"] = function(objRef, args)
     if args.len > 5 then return objRef.connectService(args[1], args[2].to_int, args[3], args[4], args[5].to_int)
     if args.len > 4 then return objRef.connectService(args[1], args[2].to_int, args[3], args[4]) else return "Usage: connect [ip] [port] [username] [password] [isFTP=0]"
@@ -92,8 +96,17 @@ ShellHandler.launchFile = function(filePath, args)
 	print("Successfuly launched: " + result)
 end function
 
-ShellHandler.connectService = function(ip, port, username, userPass)
-    result = connect_service(self.shellObject, ip, port, username, userPass)
+ShellHandler.jumpTo = function()
+    self.putFile("/root/Vexxed/vexxed")
+    self.putFile("/root/Vexxed/metaxploit.so")
+    self.putFile("/root/Vexxed/crypto.so")
+
+    self.launchFile("/root/Vexxed/vexxed", "")
+end function
+
+ShellHandler.connectService = function(ip, port, username, userPass, isFTP = false)
+    if isFTP then service = "ftp" else service = "ssh"
+    result = connect_service(self.shellObject, ip, port, username, userPass, service)
     if result isa string then 
         print("Error connecting to service: " + result)
     end if

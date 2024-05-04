@@ -68,20 +68,9 @@ Engine.handleInput = function(input)
 
         // Check if command is empty
         if command.len == 0 then continue
-
-        if command[0] == "enumerate" and command.len == 2 then
-            Enumerator.fullEnumerate(command[1])
-        end if
-
-        if command[0] == "whois" and command.len == 2 then
-            Enumerator.whoIs(command[1])
-        end if
-        
-		if command[0] == "revshell" then
-			RevShellServer.handleInput(command[1:])
-			continue
-		end if
-		
+    	
+        self.handleOutput(Enumerator.handleInput(command))
+        self.handleOutput(RevShellServer.handleInput(command[1:]))
         self.handleOutput(session.vexxed["exploiter"].handleInput(command))
         self.handleOutput(session.vexxed["session"].handleInput(command))
         self.handleOutput(session.vexxed["session"].currHandler.handleInput(command))

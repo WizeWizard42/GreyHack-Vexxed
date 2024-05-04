@@ -1069,7 +1069,7 @@ ShellHandler.jumpTo = function()
     self.putFile("/root/Vexxed/metaxploit.so")
     self.putFile("/root/Vexxed/crypto.so")
 
-    self.launchFile("/root/Vexxed/vexxed", "")
+    self.launchFile(self.fileObject.path + "/vexxed", "")
 end function
 
 ShellHandler.connectService = function(ip, port, username, userPass, isFTP = false)

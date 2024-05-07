@@ -530,8 +530,6 @@ FileHandler.displayID = "File"
 
 FileHandler.UID = null
 
-FileHandler.filePath = ["var"]
-
 // Used in Handler's handleInput. Maps user's input in terminal to their respective Handler methods.
 FileHandler.inputMap = {}
 
@@ -599,15 +597,6 @@ FileHandler.updateFileObject = function(fileObject)
     self.fileObject = fileObject
     self.genUID
     self.updateFilePath
-end function
-
-FileHandler.updateFilePath = function()
-    if not self.fileObject then
-        self.filePath = [""]
-    else
-        self.filePath = self.fileObject.path.split("/")
-        self.filePath.remove(0)
-    end if	
 end function
 
 FileHandler.listFile = function(file)
@@ -687,25 +676,19 @@ FileHandler.deleteFile = function(fileName)
     if result.trim.len != 0 then return FileDeleteError.create(fileName, result) else return "File deleted."
 end function
 
-// Changes directory appropriately. Does not support absolute paths.
+// Changes directory appropriately. Supports absolute paths.
 FileHandler.changeFile = function(command)
     changeQueue = command.split("/")
+    if command[0] == "/" then self.toRoot
     for each in changeQueue
         if each.trim.len == 0 or each == "." then continue
-        if command == ".." then
-            if self.fileObject.parent then
-                self.fileObject = self.fileObject.parent
-            else
-                self.updateFilePath
-                return GenericError.create("Cannot go up. If you aren't in /, cwd may have been deleted.")
-            end if
+        if each == ".." then
+            if self.fileObject.parent then self.fileObject = self.fileObject.parent else return GenericError.create("Cannot go up. If you aren't in /, cwd may have been deleted.")
         else
-            if not self.checkFile(command) then return FileNotFoundError.create(command)
-            self.fileObject = self.fileObject.get_folders.first("name", command)
+            if not self.checkFile(each) then return FileNotFoundError.create(each)
+            self.fileObject = self.fileObject.get_folders.first("name", each)
         end if
     end for
-
-    self.updateFilePath
 end function
 
 FileHandler.moveFile = function(fileName, filePath, newName)
@@ -898,7 +881,7 @@ end function
 // Updates with respective Computer object, then updates File object with respective path.
 ComputerHandler.updateComputerObject = function(computerObject)
     self.computerObject = computerObject
-    self.updateFileObject(computerObject.File("/" + self.filePath.join("/")))
+    self.updateFileObject(computerObject.File(self.fileObject.path))
 end function
 
 // Returns all processes running on stored Computer.

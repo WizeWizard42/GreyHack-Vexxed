@@ -50,7 +50,7 @@ end function
 // Updates with respective Computer object, then updates File object with respective path.
 ComputerHandler.updateComputerObject = function(computerObject)
     self.computerObject = computerObject
-    self.updateFileObject(computerObject.File("/" + self.filePath.join("/")))
+    self.updateFileObject(computerObject.File(self.fileObject.path))
 end function
 
 // Returns all processes running on stored Computer.

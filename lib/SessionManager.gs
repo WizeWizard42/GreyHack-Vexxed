@@ -1,5 +1,7 @@
 // SessionManager class. Handles script state and manages modifications to user session.
 // TODO: Method for loading and saving a config file
+globals.session = @get_custom_object
+
 SessionManager = {}
 
 SessionManager.currHandler = null

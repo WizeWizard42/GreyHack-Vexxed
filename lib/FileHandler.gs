@@ -78,7 +78,6 @@ end function
 FileHandler.updateFileObject = function(fileObject)
     self.fileObject = fileObject
     self.genUID
-    self.updateFilePath
 end function
 
 FileHandler.listFile = function(file)

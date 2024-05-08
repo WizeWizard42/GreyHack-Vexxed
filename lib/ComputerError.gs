@@ -1,5 +1,3 @@
-import_code("/lib/FileError.gs")
-
 GenericComputerError = new GenericError
 GenericComputerError.classID = "GenericComputerError"
 GenericComputerError.message = "An error with a computer object has occurred."

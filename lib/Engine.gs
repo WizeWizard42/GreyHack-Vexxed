@@ -1,8 +1,3 @@
-import_code("/lib/ShellHandler.gs")
-import_code("/lib/Enumerator.gs")
-import_code("/lib/Exploiter.gs")
-import_code("/lib/RevShellServer.gs")
-
 // Engine class. Forwards input to appropriate methods in different classes and serves as the main program logic.
 Engine = {}
 

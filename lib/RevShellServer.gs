@@ -1,5 +1,3 @@
-import_code("/lib/ShellHandler.gs")
-
 // RevShellServer class. Provides methods for working with reverse shells and allows Vexxed to interface with them.
 RevShellServer = {}
 

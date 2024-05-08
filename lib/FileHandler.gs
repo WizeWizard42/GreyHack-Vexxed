@@ -1,6 +1,3 @@
-import_code("/lib/FileError.gs")
-import_code("/lib/SessionManager.gs")
-
 // FileHandler class. Implements ready-made functions for interacting with the stored File object.
 FileHandler = {}
 

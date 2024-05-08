@@ -1,5 +1,3 @@
-import_code("/lib/FileHandler.gs")
-
 // ComputerHandler class. Inherits FileHandler methods and implements ready-made methods for stored Computer object.
 ComputerHandler = new FileHandler
 

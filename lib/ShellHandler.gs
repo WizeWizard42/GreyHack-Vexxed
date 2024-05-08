@@ -1,5 +1,3 @@
-import_code("/lib/ComputerHandler.gs")
-
 // ShellHandler class. Inherits ComputerHandler and implements ready-made methods for stored Shell object.
 // Use global methods when working with the internal Shell object.
 ShellHandler = new ComputerHandler

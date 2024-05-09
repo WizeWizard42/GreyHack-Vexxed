@@ -132,3 +132,36 @@ end function
 string.color = function(hexc)
     return "<color=" + hexc + ">" + self + "</color>"
 end function
+
+// Stuff added by yours truly below
+string.to_num = function()
+    strCopy = self
+    result = 0
+    decimalFound = false
+    decimalPlace = 0
+    negative = false
+
+    if self[0] == "-" then
+        negative = true
+        strCopy = self[1:]
+    end if
+
+    for i in range(0, strCopy.len - 1)
+        if strCopy[i] == "." then
+            if decimalFound then return self
+            decimalFound = true
+        else
+            digit = strCopy[i].to_int
+            if digit < 0 or digit > 9 then return self
+            if decimalFound then
+                decimalPlace  = decimalPlace + 1
+                result = result + digit / (10 ^ decimalPlace)
+            else
+                result = (result * 10) + digit
+            end if
+        end if
+    end for
+
+    if negative then result = -result
+    return result
+end function

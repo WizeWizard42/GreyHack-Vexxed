@@ -63,12 +63,29 @@ Engine.handleInput = function(input)
 
         // Check if command is empty
         if command.len == 0 then continue
+
+        if self.checkRepeat then
+            interval = user_input("ExploitReport found. Please specify repeat interval in seconds: ")
+            if interval.trim == "" then interval = 1 else interval = interval.trim.to_num
+        end if
     	
-        self.handleOutput(Enumerator.handleInput(command))
-        self.handleOutput(RevShellServer.handleInput(command[1:]))
-        self.handleOutput(session.vexxed["exploiter"].handleInput(command))
-        self.handleOutput(session.vexxed["session"].handleInput(command))
-        self.handleOutput(session.vexxed["session"].currHandler.handleInput(command))
+        while true
+            self.handleOutput(Enumerator.handleInput(command))
+            self.handleOutput(RevShellServer.handleInput(command[1:]))
+            self.handleOutput(session.vexxed["exploiter"].handleInput(command))
+            self.handleOutput(session.vexxed["session"].handleInput(command))
+            self.handleOutput(session.vexxed["session"].currHandler.handleInput(command))
+
+            if self.checkRepeat then
+                if typeof(interval) == "string" then
+                    print("Invalid interval. Please specify a number.")
+                    break
+                end if
+                wait(interval)
+            else
+                break
+            end if
+        end while
 
         if command[0] == "dumpcob" then
             for i in session.indexes
@@ -76,6 +93,19 @@ Engine.handleInput = function(input)
             end for
         end if
     end for
+end function
+
+Engine.checkRepeat = function()
+    ps = session.vexxed["homeShell"].host_computer.show_procs.split(char(10))[1:]
+
+    for p in ps
+        parsed = p.split(" ")
+        if parsed[4:5][0].trim == "ExploitReport" then
+            return true
+        end if
+    end for
+
+    return false
 end function
 
 Engine.handleOutput = function(output)

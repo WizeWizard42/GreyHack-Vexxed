@@ -1,883 +1,918 @@
 globals.H=globals
-H.Dz=true
-H.EU=false
-H.Dg="string"
-H.Dh="is"
-H.Di="contains"
-H.Dj="len"
-H.Dk="file"
-H.Dl="name"
-H.Dm="namehas"
-H.Dn="path"
-H.Do="permissions"
-H.Dp="has_permission"
-H.Dw=""
-H.Dq="size"
-H.Dr="port"
-H.Ds="port_number"
-H.Dt="is_closed"
-H.Du="get_lan_ip"
-H.Dv="map"
-H.Dx=": "
-H.Dy=" to "
-H.EJ=0
-H.D_=null
-H.EG=1
-H.EL=2
-H.EH=" "
-H.Ec="exploiter"
-H.EF="session"
-H.EA="/metaxploit.so"
-H.EB="/crypto.so"
-H.EK="homeShell"
-H.EE="remoteShell"
-H.EW="homeMetax"
-H.Eb="revMetax"
-H.EC="remoteMetax"
-H.EX="homeCrypto"
-H.ED="remoteCrypto"
-H.ES=3
-H.EI="/"
-H.ER="\n"
-H.EP="."
-H.EM="r"
-H.EN="w"
-H.EO="x"
-H.ET="/root/Loot/"
-H.EQ="fstab"
-H.Ea="shell"
-H.EZ=":"
-H.EV="  "
-H.EY="/root/Vexxed/payloads.db"
-map.first=function(Q,R)
-for S in self.indexes
-if self[S][Q]==R then
-return self[S]
+H.EF=true
+H.EE=false
+H.Dp="string"
+H.Dq="is"
+H.Dr="contains"
+H.Ds="len"
+H.Dt="file"
+H.Du="name"
+H.Dv="namehas"
+H.Dw="path"
+H.Dx="permissions"
+H.Dy="has_permission"
+H.EG=""
+H.Dz="size"
+H.D_="port"
+H.EA="port_number"
+H.EB="is_closed"
+H.EC="get_lan_ip"
+H.ED="map"
+H.ER=0
+H.EJ=1
+H.EV="."
+H.Ei=10
+H.EH=": "
+H.EI=" to "
+H.EK=null
+H.EW=2
+H.ES=" "
+H.Em="exploiter"
+H.EQ="session"
+H.EL="/metaxploit.so"
+H.EM="/crypto.so"
+H.EU="homeShell"
+H.EP="remoteShell"
+H.Ef="homeMetax"
+H.El="revMetax"
+H.EN="remoteMetax"
+H.Eg="homeCrypto"
+H.EO="remoteCrypto"
+H.Ec=3
+H.ET="/"
+H.Eb="\n"
+H.EX="r"
+H.EY="w"
+H.EZ="x"
+H.Ed="/root/Loot/"
+H.Ea="fstab"
+H.Ek="shell"
+H.Ej=":"
+H.Ee="  "
+H.Eh="/root/Vexxed/payloads.db"
+map.first=function(R,S)
+for T in self.indexes
+if self[T][R]==S then
+return self[T]
 end if
 end for
 end function
-map.where=function(Q,R)
-T={}
-for S in self.indexes
-if self[S][Q]==R then
-T.push(self[S])
+map.where=function(R,S)
+U={}
+for T in self.indexes
+if self[T][R]==S then
+U.push(self[T])
 end if
 end for
-return T
+return U
 end function
-map.wherenot=function(Q,R)
-T={}
-for S in self.indexes
-if self[S][Q]!=R then
-T.push(self[S])
+map.wherenot=function(R,S)
+U={}
+for T in self.indexes
+if self[T][R]!=S then
+U.push(self[T])
 end if
 end for
-return T
+return U
 end function
-map.hasMethod=function(U)
-V=self
-if V.hasIndex(U) then
-return Dz
+map.hasMethod=function(V)
+W=self
+if W.hasIndex(V) then
+return EF
 end if
-while V.hasIndex("__isa")
-V=V["__isa"]
-if V.hasIndex(U) then
-return Dz
+while W.hasIndex("__isa")
+W=W["__isa"]
+if W.hasIndex(V) then
+return EF
 end if
 end while
-return EU
+return EE
 end function
-list.first=function(Q,R)
-for S in self
-if typeof(S)==Dg then
-if Q==Dh and S==R then
-return S
-end if
-if Q==Di and S.is_match(R) then
-return S
-end if
-if Q==Dj and S.len==R then
-return S
-end if
-else if typeof(S)==Dk then
-if Q==Dl and S.name==R then
-return S
-end if
-if Q==Dm and S.name.is_match(R) then
-T.push(S)
-end if
-if Q==Dn and S.path==R then
-return S
-end if
-if Q==Do and S.permissions==R then
-return S
-end if
-if Q==Dp then
-W=R.values
-X=Dw
-for Y in W
-if S.has_permission(Y) then
-X=X+Y
-end if
-end for
-if X==R then
-return S
-end if
-end if
-if Q==Dq and S.size==R then
-return S
-end if
-else if typeof(S)==Dr then
-if Q==Ds and S.port_number==R then
-return S
-end if
-if Q==Dt and S.is_closed==R then
-return S
-end if
-if Q==Du and S.get_lan_ip==R then
-return S
-end if
-else if typeof(S)==Dv then
-if S[Q]==R then
-return S
-end if
-end if
-end for
-end function
-list.where=function(Q,R)
-T=[]
-for S in self
-if typeof(S)==Dg then
-if Q==Dh and S==R then
-T.push(S)
-end if
-if Q==Di and S.is_match(R) then
-T.push(S)
-end if
-if Q==Dj and S.len==R then
-T.push(S)
-end if
-else if typeof(S)==Dk then
-if Q==Dl and S.name==R then
-T.push(S)
-end if
-if Q==Dm and S.name.is_match(R) then
-T.push(S)
-end if
-if Q==Dn and S.path==R then
-T.push(S)
-end if
-if Q==Do and S.permissions==R then
-T.push(S)
-end if
-if Q==Dp then
-W=R.values
-X=Dw
-for Y in W
-if S.has_permission(Y) then
-X=X+Y
-end if
-end for
-if X==R then
-T.push(S)
-end if
-end if
-if Q==Dq and S.size==R then
-T.push(S)
-end if
-else if typeof(S)==Dr then
-if Q==Ds and S.port_number==R then
-T.push(S)
-end if
-if Q==Dt and S.is_closed==R then
-T.push(S)
-end if
-if Q==Du and S.get_lan_ip==R then
-T.push(S)
-end if
-else if typeof(S)==Dv then
-if S[Q]==R then
-T.push(S)
-end if
-end if
-end for
+list.first=function(R,S)
+for T in self
+if typeof(T)==Dp then
+if R==Dq and T==S then
 return T
-end function
-list.wherenot=function(Q,R)
-T=[]
-for S in self
-if typeof(S)==Dg then
-if Q==Dh and S!=R then
-T.push(S)
 end if
-if Q==Di and not S.is_match(R) then
-T.push(S)
-end if
-if Q==Dj and S.len!=R then
-T.push(S)
-end if
-else if typeof(S)==Dk then
-if Q==Dl and S.name!=R then
-T.push(S)
-end if
-if Q==Dm and S.name.is_match(R) then
-T.push(S)
-end if
-if Q==Dn and S.path!=R then
-T.push(S)
-end if
-if Q==Do and S.permissions!=R then
-T.push(S)
-end if
-if Q==Dp then
-W=R.values
-X=Dw
-for Y in W
-if S.has_permission(Y) then
-X=X+Y
-end if
-end for
-if X!=R then
-T.push(S)
-end if
-end if
-if Q==Dq and S.size!=R then
-T.push(S)
-end if
-else if typeof(S)==Dr then
-if Q==Ds and S.port_number!=R then
-T.push(S)
-end if
-if Q==Dt and S.is_closed!=R then
-T.push(S)
-end if
-if Q==Du and S.get_lan_ip!=R then
-T.push(S)
-end if
-else if typeof(S)==Dv then
-if S[Q]!=R then
-T.push(S)
-end if
-end if
-end for
+if R==Dr and T.is_match(S) then
 return T
+end if
+if R==Ds and T.len==S then
+return T
+end if
+else if typeof(T)==Dt then
+if R==Du and T.name==S then
+return T
+end if
+if R==Dv and T.name.is_match(S) then
+U.push(T)
+end if
+if R==Dw and T.path==S then
+return T
+end if
+if R==Dx and T.permissions==S then
+return T
+end if
+if R==Dy then
+X=S.values
+Y=EG
+for Z in X
+if T.has_permission(Z) then
+Y=Y+Z
+end if
+end for
+if Y==S then
+return T
+end if
+end if
+if R==Dz and T.size==S then
+return T
+end if
+else if typeof(T)==D_ then
+if R==EA and T.port_number==S then
+return T
+end if
+if R==EB and T.is_closed==S then
+return T
+end if
+if R==EC and T.get_lan_ip==S then
+return T
+end if
+else if typeof(T)==ED then
+if T[R]==S then
+return T
+end if
+end if
+end for
+end function
+list.where=function(R,S)
+U=[]
+for T in self
+if typeof(T)==Dp then
+if R==Dq and T==S then
+U.push(T)
+end if
+if R==Dr and T.is_match(S) then
+U.push(T)
+end if
+if R==Ds and T.len==S then
+U.push(T)
+end if
+else if typeof(T)==Dt then
+if R==Du and T.name==S then
+U.push(T)
+end if
+if R==Dv and T.name.is_match(S) then
+U.push(T)
+end if
+if R==Dw and T.path==S then
+U.push(T)
+end if
+if R==Dx and T.permissions==S then
+U.push(T)
+end if
+if R==Dy then
+X=S.values
+Y=EG
+for Z in X
+if T.has_permission(Z) then
+Y=Y+Z
+end if
+end for
+if Y==S then
+U.push(T)
+end if
+end if
+if R==Dz and T.size==S then
+U.push(T)
+end if
+else if typeof(T)==D_ then
+if R==EA and T.port_number==S then
+U.push(T)
+end if
+if R==EB and T.is_closed==S then
+U.push(T)
+end if
+if R==EC and T.get_lan_ip==S then
+U.push(T)
+end if
+else if typeof(T)==ED then
+if T[R]==S then
+U.push(T)
+end if
+end if
+end for
+return U
+end function
+list.wherenot=function(R,S)
+U=[]
+for T in self
+if typeof(T)==Dp then
+if R==Dq and T!=S then
+U.push(T)
+end if
+if R==Dr and not T.is_match(S) then
+U.push(T)
+end if
+if R==Ds and T.len!=S then
+U.push(T)
+end if
+else if typeof(T)==Dt then
+if R==Du and T.name!=S then
+U.push(T)
+end if
+if R==Dv and T.name.is_match(S) then
+U.push(T)
+end if
+if R==Dw and T.path!=S then
+U.push(T)
+end if
+if R==Dx and T.permissions!=S then
+U.push(T)
+end if
+if R==Dy then
+X=S.values
+Y=EG
+for Z in X
+if T.has_permission(Z) then
+Y=Y+Z
+end if
+end for
+if Y!=S then
+U.push(T)
+end if
+end if
+if R==Dz and T.size!=S then
+U.push(T)
+end if
+else if typeof(T)==D_ then
+if R==EA and T.port_number!=S then
+U.push(T)
+end if
+if R==EB and T.is_closed!=S then
+U.push(T)
+end if
+if R==EC and T.get_lan_ip!=S then
+U.push(T)
+end if
+else if typeof(T)==ED then
+if T[R]!=S then
+U.push(T)
+end if
+end if
+end for
+return U
 end function
 string.regex_escape=function
-Z=self
-for a in "+*?^$.[]{}()|/"
-Z=Z.replace("\"+a,"\"+a)
+a=self
+for b in "+*?^$.[]{}()|/"
+a=a.replace("\"+b,"\"+b)
 end for
-return Z
+return a
 end function
-string.color=function(b)
-return "<color="+b+">"+self+"</color>"
+string.color=function(c)
+return "<color="+c+">"+self+"</color>"
 end function
-c={}
-c.classID="GenericError"
-c.message="An error occurred."
-c.create=function(e="An error occurred.")
-u=new c
-u.message=e
-return u
+string.to_num=function
+d=self
+a=ER
+e=EE
+f=ER
+g=EE
+if self[ER]=="-" then
+g=EF
+d=self[EJ:]
+end if
+for h in range(ER,d.len-EJ)
+if d[h]==EV then
+if e then
+return self
+end if
+e=EF
+else
+i=d[h].to_int
+if i<ER or i>9 then
+return self
+end if
+if e then
+f=f+EJ
+a=a+i/(Ei^f)
+else
+a=(a*Ei)+i
+end if
+end if
+end for
+if g then
+a=-a
+end if
+return a
 end function
-c.toString=function
+j={}
+j.classID="GenericError"
+j.message="An error occurred."
+j.create=function(l="An error occurred.")
+AB=new j
+AB.message=l
+return AB
+end function
+j.toString=function
 return self.message
 end function
-h=new c
-h.classID="GenericFileError"
-h.message="An error occurred with a file."
-h.fileName=Dw
-h.create=function(Ab="")
-u=new h
-u.message="An error occurred with file: "+Ab
-u.fileName=Ab
-return u
+o=new j
+o.classID="GenericFileError"
+o.message="An error occurred with a file."
+o.fileName=EG
+o.create=function(p="")
+AB=new o
+AB.message="An error occurred with file: "+p
+AB.fileName=p
+return AB
 end function
-j=new h
-j.classID="FileNotFoundError"
-j.message="File or directory not found."
-j.fileName=Dw
-j.create=function(Ab="")
-u=new j
-u.message="File or directory not found: "+Ab
-u.fileName=Ab
-return u
+q=new o
+q.classID="FileNotFoundError"
+q.message="File or directory not found."
+q.fileName=EG
+q.create=function(p="")
+AB=new q
+AB.message="File or directory not found: "+p
+AB.fileName=p
+return AB
 end function
-k=new h
-k.classID="FileReadError"
-k.message="Error reading file."
-k.fileName=Dw
-k.create=function(Ab="")
-u=new k
-u.message="Error reading file: "+Ab
-u.fileName=Ab
-return u
+r=new o
+r.classID="FileReadError"
+r.message="Error reading file."
+r.fileName=EG
+r.create=function(p="")
+AB=new r
+AB.message="Error reading file: "+p
+AB.fileName=p
+return AB
 end function
-l=new h
-l.classID="FileWriteError"
-l.message="Error writing file."
-l.fileName=Dw
-l.reason=Dw
-l.create=function(Ab="",m="")
-u=new l
-u.message="Error writing file "+Ab+Dx+m
-u.fileName=Ab
-u.reason=m
-return u
+s=new o
+s.classID="FileWriteError"
+s.message="Error writing file."
+s.fileName=EG
+s.reason=EG
+s.create=function(p="",t="")
+AB=new s
+AB.message="Error writing file "+p+EH+t
+AB.fileName=p
+AB.reason=t
+return AB
 end function
-n=new h
-n.classID="FileDeleteError"
-n.message="Error deleting file."
-n.fileName=Dw
-n.reason=Dw
-n.create=function(Ab="",m="")
-u=new n
-u.message="Error deleting file "+Ab+Dx+m
-u.fileName=Ab
-u.reason=m
-return u
-end function
-o=new h
-o.classID="FileCopyError"
-o.message="Error copying file."
-o.fileName=Dw
-o.destination=Dw
-o.reason=Dw
-o.create=function(Ab="",p="",m="")
 u=new o
-u.message="Error copying file "+Ab+Dy+p+Dx+m
-u.fileName=Ab
-u.destination=p
-u.reason=m
-return u
+u.classID="FileDeleteError"
+u.message="Error deleting file."
+u.fileName=EG
+u.reason=EG
+u.create=function(p="",t="")
+AB=new u
+AB.message="Error deleting file "+p+EH+t
+AB.fileName=p
+AB.reason=t
+return AB
 end function
-q=new h
-q.classID="FileMoveError"
-q.message="Error moving file."
-q.fileName=Dw
-q.destination=Dw
-q.reason=Dw
-q.create=function(Ab="",p="",m="")
-u=new q
-u.message="Error moving file "+Ab+Dy+p+Dx+m
-u.fileName=Ab
-u.destination=p
-u.reason=m
-return u
-end function
-r=new h
-r.classID="FileChmodError"
-r.message="Error changing file permissions."
-r.fileName=Dw
-r.permissions=Dw
-r.reason=Dw
-r.create=function(Ab="",permissions="",m="")
-u=new r
-u.message="Error changing file permissions for "+Ab+Dy+permissions+Dx+m
-u.fileName=Ab
-u.permissions=permissions
-u.reason=m
-return u
-end function
-s=new h
-s.classID="FileChgrpError"
-s.message="Error changing file group."
-s.fileName=Dw
-s.group=Dw
-s.reason=Dw
-s.create=function(Ab="",group="",m="")
-u=new s
-u.message="Error changing file group for "+Ab+Dy+group+Dx+m
-u.fileName=Ab
-u.group=group
-u.reason=m
-return u
-end function
-t=new h
-t.classID="FileChownError"
-t.message="Error changing file owner."
-t.fileName=Dw
-t.owner=Dw
-t.reason=Dw
-t.create=function(Ab="",owner="",m="")
-u=new t
-u.message="Error changing file owner for "+Ab+Dy+owner+Dx+m
-u.fileName=Ab
-u.owner=owner
-u.reason=m
-return u
-end function
-v=new c
-v.classID="GenericComputerError"
-v.message="An error with a computer object has occurred."
-v.create=function
-return new v
-end function
-w=new v
-w.classID="ComputerProcError"
-w.message="Error killing a process."
-w.pid=EJ
-w.reason=Dw
-w.create=function(x=0,m="")
-u=new w
-u.message="Error killing process: "+x+Dx+m
-u.pid=x
-u.reason=m
-return u
-end function
-y=new v
-y.classID="ComputerUserAddError"
-y.message="Error adding a user."
-y.username=Dw
-y.password=Dw
-y.reason=Dw
-y.create=function(z="",_A="",m="")
-u=new y
-u.message="Error adding user "+z+" with password "+_A+Dx+m
-u.username=z
-u.password=_A
-u.reason=m
-return u
-end function
+v=new o
+v.classID="FileCopyError"
+v.message="Error copying file."
+v.fileName=EG
+v.destination=EG
+v.reason=EG
+v.create=function(p="",w="",t="")
 AB=new v
-AB.classID="ComputerUserRemoveError"
-AB.message="Error removing a user."
-AB.username=Dw
-AB.reason=Dw
-AB.create=function(z="",m="")
-u=new AB
-u.message="Error removing user "+z+Dx+m
-u.username=z
-u.reason=m
-return u
+AB.message="Error copying file "+p+EI+w+EH+t
+AB.fileName=p
+AB.destination=w
+AB.reason=t
+return AB
 end function
-AC=new v
-AC.classID="ComputerUserChPassError"
-AC.message="Error changing a user's password."
-AC.username=Dw
-AC.password=Dw
-AC.reason=Dw
-AC.create=function(z="",_A="",m="")
-u=new AC
-u.message="Error changing password for user "+z+Dy+_A+Dx+m
-u.username=z
-u.password=_A
-u.reason=m
-return u
+x=new o
+x.classID="FileMoveError"
+x.message="Error moving file."
+x.fileName=EG
+x.destination=EG
+x.reason=EG
+x.create=function(p="",w="",t="")
+AB=new x
+AB.message="Error moving file "+p+EI+w+EH+t
+AB.fileName=p
+AB.destination=w
+AB.reason=t
+return AB
 end function
-AD=new v
-AD.classID="ComputerTouchError"
-AD.message="Error touching a file."
-AD.filename=Dw
-AD.reason=Dw
-AD.create=function(AE="",m="")
-u=new AD
-u.message="Error touching file "+AE+Dx+m
-u.filename=AE
-u.reason=m
-return u
+y=new o
+y.classID="FileChmodError"
+y.message="Error changing file permissions."
+y.fileName=EG
+y.permissions=EG
+y.reason=EG
+y.create=function(p="",permissions="",t="")
+AB=new y
+AB.message="Error changing file permissions for "+p+EI+permissions+EH+t
+AB.fileName=p
+AB.permissions=permissions
+AB.reason=t
+return AB
 end function
-AF=new v
-AF.classID="ComputerMkdirError"
-AF.message="Error creating a directory."
-AF.directory=Dw
-AF.reason=Dw
-AF.create=function(AG="",m="")
-u=new AF
-u.message="Error creating directory "+AG+Dx+m
-u.directory=AG
-u.reason=m
-return u
+z=new o
+z.classID="FileChgrpError"
+z.message="Error changing file group."
+z.fileName=EG
+z.group=EG
+z.reason=EG
+z.create=function(p="",group="",t="")
+AB=new z
+AB.message="Error changing file group for "+p+EI+group+EH+t
+AB.fileName=p
+AB.group=group
+AB.reason=t
+return AB
 end function
-AH=new v
-AH.classID="ComputerInvalidInterfaceError"
-AH.message="Invalid interface."
-AH.interface=Dw
-AH.create=function(AI="")
-u=new AH
-u.message="Invalid interface: "+AI
-u.interface=AI
-return u
+_A=new o
+_A.classID="FileChownError"
+_A.message="Error changing file owner."
+_A.fileName=EG
+_A.owner=EG
+_A.reason=EG
+_A.create=function(p="",owner="",t="")
+AB=new _A
+AB.message="Error changing file owner for "+p+EI+owner+EH+t
+AB.fileName=p
+AB.owner=owner
+AB.reason=t
+return AB
 end function
-H.AJ=@get_custom_object
-AK={}
-AK.currHandler=D_
-AK.handlerStack=[]
-AK.sessionStack=[]
-AK.currLib={}
-AK.inputMap={}
-AK.inputMap["pop"]=function(AX,AY)
-if AY.len>EG then
-AZ=AY[EG]
+AC=new j
+AC.classID="GenericComputerError"
+AC.message="An error with a computer object has occurred."
+AC.create=function
+return new AC
+end function
+AD=new AC
+AD.classID="ComputerProcError"
+AD.message="Error killing a process."
+AD.pid=ER
+AD.reason=EG
+AD.create=function(AE=0,t="")
+AB=new AD
+AB.message="Error killing process: "+AE+EH+t
+AB.pid=AE
+AB.reason=t
+return AB
+end function
+AF=new AC
+AF.classID="ComputerUserAddError"
+AF.message="Error adding a user."
+AF.username=EG
+AF.password=EG
+AF.reason=EG
+AF.create=function(AG="",AH="",t="")
+AB=new AF
+AB.message="Error adding user "+AG+" with password "+AH+EH+t
+AB.username=AG
+AB.password=AH
+AB.reason=t
+return AB
+end function
+AI=new AC
+AI.classID="ComputerUserRemoveError"
+AI.message="Error removing a user."
+AI.username=EG
+AI.reason=EG
+AI.create=function(AG="",t="")
+AB=new AI
+AB.message="Error removing user "+AG+EH+t
+AB.username=AG
+AB.reason=t
+return AB
+end function
+AJ=new AC
+AJ.classID="ComputerUserChPassError"
+AJ.message="Error changing a user's password."
+AJ.username=EG
+AJ.password=EG
+AJ.reason=EG
+AJ.create=function(AG="",AH="",t="")
+AB=new AJ
+AB.message="Error changing password for user "+AG+EI+AH+EH+t
+AB.username=AG
+AB.password=AH
+AB.reason=t
+return AB
+end function
+AK=new AC
+AK.classID="ComputerTouchError"
+AK.message="Error touching a file."
+AK.filename=EG
+AK.reason=EG
+AK.create=function(AL="",t="")
+AB=new AK
+AB.message="Error touching file "+AL+EH+t
+AB.filename=AL
+AB.reason=t
+return AB
+end function
+AM=new AC
+AM.classID="ComputerMkdirError"
+AM.message="Error creating a directory."
+AM.directory=EG
+AM.reason=EG
+AM.create=function(AN="",t="")
+AB=new AM
+AB.message="Error creating directory "+AN+EH+t
+AB.directory=AN
+AB.reason=t
+return AB
+end function
+AO=new AC
+AO.classID="ComputerInvalidInterfaceError"
+AO.message="Invalid interface."
+AO.interface=EG
+AO.create=function(AP="")
+AB=new AO
+AB.message="Invalid interface: "+AP
+AB.interface=AP
+return AB
+end function
+H.AQ=@get_custom_object
+AR={}
+AR.currHandler=EK
+AR.handlerStack=[]
+AR.sessionStack=[]
+AR.currLib={}
+AR.inputMap={}
+AR.inputMap["pop"]=function(Ae,Af)
+if Af.len>EJ then
+Ag=Af[EJ]
 else
-AZ=-EG
+Ag=-EJ
 end if
-if AX.handlerStack.len<EL or AZ==EJ then
-return c.create("Error: cannot pop local shell.")
+if Ae.handlerStack.len<EW or Ag==ER then
+return j.create("Error: cannot pop local shell.")
 end if
-AX.handlerStack.remove(AZ)
-if not AX.handlerStack.indexOf(AX.currHandler) then
-AX.updateCurrHandler(-EG)
+Ae.handlerStack.remove(Ag)
+if not Ae.handlerStack.indexOf(Ae.currHandler) then
+Ae.updateCurrHandler(-EJ)
 end if
 end function
-AK.inputMap["hstack"]=function(AX,AY)
-for Aa in range(EJ,AX.handlerStack.len-EG)
-Ac=AX.handlerStack[Aa]
-if Ac.UID==AX.currHandler.UID then
-print(Aa+"* "+Ac.classID+Dx+Ac.getPubIP+EH+Ac.getLANIP)
+AR.inputMap["hstack"]=function(Ae,Af)
+for h in range(ER,Ae.handlerStack.len-EJ)
+Ah=Ae.handlerStack[h]
+if Ah.UID==Ae.currHandler.UID then
+print(h+"* "+Ah.classID+EH+Ah.getPubIP+ES+Ah.getLANIP)
 else
-print(Aa+EH+Ac.classID+Dx+Ac.getPubIP+EH+Ac.getLANIP)
+print(h+ES+Ah.classID+EH+Ah.getPubIP+ES+Ah.getLANIP)
 end if
 end for
 end function
-AK.inputMap["use"]=function(AX,AY)
-if AY.len<EL then
+AR.inputMap["use"]=function(Ae,Af)
+if Af.len<EW then
 return "Usage: use [index]"
 end if
-AX.addHandler(AJ.vexxed[Ec].resultObjects[AJ.vexxed[EF].currLib][AY[EG].to_int])
+Ae.addHandler(AQ.vexxed[Em].resultObjects[AQ.vexxed[EQ].currLib][Af[EJ].to_int])
 end function
-AK.inputMap["switch"]=function(AX,AY)
-if AY.len<EL then
+AR.inputMap["switch"]=function(Ae,Af)
+if Af.len<EW then
 print("Error: switch requires a handler index.")
 return 
 end if
-AX.updateCurrHandler(AY[EG].to_int)
+Ae.updateCurrHandler(Af[EJ].to_int)
 end function
-AK.updateCurrHandler=function(AZ)
-self.currHandler=self.handlerStack[AZ]
+AR.updateCurrHandler=function(Ag)
+self.currHandler=self.handlerStack[Ag]
 end function
-AK.addHandler=function(Ac)
-self.handlerStack.push(Ac)
-self.updateCurrHandler(-EG)
+AR.addHandler=function(Ah)
+self.handlerStack.push(Ah)
+self.updateCurrHandler(-EJ)
 end function
-AK.setCurrLib=function(val)
+AR.setCurrLib=function(val)
 self.currLib=val
 end function
-AK.initSession=function
-H.Ai=include_lib(current_path+"/aptclient.so")
-if not Ai then
+AR.initSession=function
+H.An=include_lib(current_path+"/aptclient.so")
+if not An then
 exit("Could not import aptclient. Exiting.")
 end if
-Ai.update
-if get_shell.host_computer.File(current_path+EA)==D_ or Ai.check_upgrade(current_path+EA)==Dz then
-Ai.install("metaxploit.so",current_path)
+An.update
+if get_shell.host_computer.File(current_path+EL)==EK or An.check_upgrade(current_path+EL)==EF then
+An.install("metaxploit.so",current_path)
 end if
-if get_shell.host_computer.File(current_path+EB)==D_ or Ai.check_upgrade(current_path+EB)==Dz then
-Ai.install("crypto.so",current_path)
+if get_shell.host_computer.File(current_path+EM)==EK or An.check_upgrade(current_path+EM)==EF then
+An.install("crypto.so",current_path)
 end if
-H.Aj=include_lib(current_path+EA)
-H.Ak=include_lib(current_path+EB)
-if not Aj then
+H.Ao=include_lib(current_path+EL)
+H.Ap=include_lib(current_path+EM)
+if not Ao then
 exit("Could not import metaxploit. Exiting.")
 end if
-if not Ak then
+if not Ap then
 exit("Could not import crypto. Exiting.")
 end if
-AJ.vexxed={}
-AJ.vexxed[EF]=self
-AJ.vexxed[Ec]=H.Al
-AJ.vexxed[EK]=get_shell
-AJ.vexxed[EE]=get_shell
-AJ.vexxed[EW]=Aj
-AJ.vexxed[Eb]=Aj
-AJ.vexxed[EC]=Aj
-AJ.vexxed[EX]=Ak
-AJ.vexxed[ED]=Ak
+AQ.vexxed={}
+AQ.vexxed[EQ]=self
+AQ.vexxed[Em]=H.Aq
+AQ.vexxed[EU]=get_shell
+AQ.vexxed[EP]=get_shell
+AQ.vexxed[Ef]=Ao
+AQ.vexxed[El]=Ao
+AQ.vexxed[EN]=Ao
+AQ.vexxed[Eg]=Ap
+AQ.vexxed[EO]=Ap
 end function
-AK.importSession=function
-H.Aj=include_lib(current_path+EA)
-H.Ak=include_lib(current_path+EB)
-if not Aj then
+AR.importSession=function
+H.Ao=include_lib(current_path+EL)
+H.Ap=include_lib(current_path+EM)
+if not Ao then
 exit("Could not import metaxploit. Exiting.")
 end if
-if not Ak then
+if not Ap then
 exit("Could not import crypto. Exiting.")
 end if
-Am={}
-Am[EC]=AJ.vexxed[EC]
-Am[ED]=AJ.vexxed[ED]
-Am[EE]=AJ.vexxed[EE]
-AJ.vexxed[EF].sessionStack.push(Am)
-AJ.vexxed[EC]=Aj
-AJ.vexxed[ED]=Ak
-AJ.vexxed[EE]=get_shell
+Ar={}
+Ar[EN]=AQ.vexxed[EN]
+Ar[EO]=AQ.vexxed[EO]
+Ar[EP]=AQ.vexxed[EP]
+AQ.vexxed[EQ].sessionStack.push(Ar)
+AQ.vexxed[EN]=Ao
+AQ.vexxed[EO]=Ap
+AQ.vexxed[EP]=get_shell
 end function
-AK.exitLayer=function
-if self.sessionStack.len==EJ then
+AR.exitLayer=function
+if self.sessionStack.len==ER then
 print("No previous layer to return to. Returning to terminal.")
 return 
 end if
-Am=self.sessionStack.pop
-AJ.vexxed[EC]=Am[EC]
-AJ.vexxed[ED]=Am[ED]
-AJ.vexxed[EE]=Am[EE]
+Ar=self.sessionStack.pop
+AQ.vexxed[EN]=Ar[EN]
+AQ.vexxed[EO]=Ar[EO]
+AQ.vexxed[EP]=Ar[EP]
 end function
-AK.handleInput=function(An)
-if An.len==EJ or not self.inputMap.hasMethod(An[EJ]) then
+AR.handleInput=function(As)
+if As.len==ER or not self.inputMap.hasMethod(As[ER]) then
 return 
 end if
-Ao=@self.inputMap[An[EJ]]
-return Ao(self,An)
+At=@self.inputMap[As[ER]]
+return At(self,As)
 end function
-Ap={}
-Ap.fileObject=D_
-Ap.classID="FileHandler"
-Ap.displayID="File"
-Ap.UID=D_
-Ap.inputMap={}
-Ap.inputMap["ls"]=function(AX,AY)
-return AX.getFiles
+Au={}
+Au.fileObject=EK
+Au.classID="FileHandler"
+Au.displayID="File"
+Au.UID=EK
+Au.inputMap={}
+Au.inputMap["ls"]=function(Ae,Af)
+return Ae.getFiles
 end function
-Ap.inputMap["cat"]=function(AX,AY)
-if AY.len>EG then
-return AX.readFile(AY[EG])
+Au.inputMap["cat"]=function(Ae,Af)
+if Af.len>EJ then
+return Ae.readFile(Af[EJ])
 else
 return "Usage: cat [file]"
 end if
 end function
-Ap.inputMap["rm"]=function(AX,AY)
-if AY.len>EG then
-return AX.deleteFile(AY[EG])
+Au.inputMap["rm"]=function(Ae,Af)
+if Af.len>EJ then
+return Ae.deleteFile(Af[EJ])
 else
 return "Usage: rm [file]"
 end if
 end function
-Ap.inputMap["cd"]=function(AX,AY)
-if AY.len>EG then
-return AX.changeFile(AY[EG])
+Au.inputMap["cd"]=function(Ae,Af)
+if Af.len>EJ then
+return Ae.changeFile(Af[EJ])
 else
 return "Usage: cd [directory]"
 end if
 end function
-Ap.inputMap["cp"]=function(AX,AY)
-if AY.len>ES then
-return AX.copyFile(AY[EG],AY[EL],AY[ES])
+Au.inputMap["cp"]=function(Ae,Af)
+if Af.len>Ec then
+return Ae.copyFile(Af[EJ],Af[EW],Af[Ec])
 else
 return "Usage: cp [file] [path] [newName]"
 end if
 end function
-Ap.inputMap["mv"]=function(AX,AY)
-if AY.len>ES then
-return AX.moveFile(AY[EG],AY[EL],AY[ES])
+Au.inputMap["mv"]=function(Ae,Af)
+if Af.len>Ec then
+return Ae.moveFile(Af[EJ],Af[EW],Af[Ec])
 else
 return "Usage: mv [file] [path] [newName]"
 end if
 end function
-Ap.inputMap["gettext"]=function(AX,AY)
-if AY.len>EG then
-return AX.getTextFile(AY[EG])
+Au.inputMap["gettext"]=function(Ae,Af)
+if Af.len>EJ then
+return Ae.getTextFile(Af[EJ])
 else
 return "Usage: gettext [file]"
 end if
 end function
-Ap.inputMap["chmod"]=function(AX,AY)
-if AY.len>ES then
-return AX.changePerms(AY[EG],AY[EL],AY[ES].to_int)
+Au.inputMap["chmod"]=function(Ae,Af)
+if Af.len>Ec then
+return Ae.changePerms(Af[EJ],Af[EW],Af[Ec].to_int)
 else
 return "Usage: chmod [file] [perms] [recursive]"
 end if
 end function
-Ap.inputMap["chgrp"]=function(AX,AY)
-if AY.len>ES then
-return AX.changeGroup(AY[EG],AY[EL],AY[ES].to_int)
+Au.inputMap["chgrp"]=function(Ae,Af)
+if Af.len>Ec then
+return Ae.changeGroup(Af[EJ],Af[EW],Af[Ec].to_int)
 else
 return "Usage: chgrp [file] [group] [recursive]"
 end if
 end function
-Ap.inputMap["chown"]=function(AX,AY)
-if AY.len>ES then
-return AX.changeOwner(AY[EG],AY[EL],AY[ES].to_int)
+Au.inputMap["chown"]=function(Ae,Af)
+if Af.len>Ec then
+return Ae.changeOwner(Af[EJ],Af[EW],Af[Ec].to_int)
 else
 return "Usage: chown [file] [owner] [recursive]"
 end if
 end function
-Ap.inputMap["write"]=function(AX,AY)
-if AY.len>EL then
-return AX.writeFile(AY[EG],AY[EL:].join(EH))
+Au.inputMap["write"]=function(Ae,Af)
+if Af.len>EW then
+return Ae.writeFile(Af[EJ],Af[EW:].join(ES))
 else
 return "Usage: write [file] [content]"
 end if
 end function
-Ap.inputMap["fschk"]=function(AX,AY)
-if AY.len>EG then
-Ab=AY[EG]
+Au.inputMap["fschk"]=function(Ae,Af)
+if Af.len>EJ then
+p=Af[EJ]
 else
-Ab=EI
+p=ET
 end if
-return AX.treeAction(Ab,@AX.accessCheck)
+return Ae.treeAction(p,@Ae.accessCheck)
 end function
-Ap.inputMap["logwipe"]=function(AX,AY)
-return AX.logWipe
+Au.inputMap["logwipe"]=function(Ae,Af)
+return Ae.logWipe
 end function
-Ap.getObject=function
+Au.getObject=function
 return self.fileObject
 end function
-Ap.updateFileObject=function(Aq)
-self.fileObject=Aq
+Au.updateFileObject=function(Av)
+self.fileObject=Av
 self.genUID
 end function
-Ap.listFile=function(BM)
-return BM.permissions+EH+BM.owner+EH+BM.group+EH+BM.size+EH+BM.name
+Au.listFile=function(BR)
+return BR.permissions+ES+BR.owner+ES+BR.group+ES+BR.size+ES+BR.name
 end function
-Ap.getFiles=function
-Z=Dw
-Z=Z+"Permissions Owner Group Size Name\n"
-Z=Z+self.fileObject.permissions+EH+self.fileObject.owner+EH+self.fileObject.group+EH+self.fileObject.size+" .\n"
-for BM in self.fileObject.get_files
-Z=Z+self.listFile(BM)+ER
+Au.getFiles=function
+a=EG
+a=a+"Permissions Owner Group Size Name\n"
+a=a+self.fileObject.permissions+ES+self.fileObject.owner+ES+self.fileObject.group+ES+self.fileObject.size+" .\n"
+for BR in self.fileObject.get_files
+a=a+self.listFile(BR)+Eb
 end for
-for BN in self.fileObject.get_folders
-Z=Z+self.listFile(BN)+ER
+for BS in self.fileObject.get_folders
+a=a+self.listFile(BS)+Eb
 end for
-return format_columns(Z)
+return format_columns(a)
 end function
-Ap.checkFile=function(Ab)
-if Ab==EP then
+Au.checkFile=function(p)
+if p==EV then
 return self.fileObject
 end if
-BM=self.fileObject.get_files.first(Dl,Ab)
-BN=self.fileObject.get_folders.first(Dl,Ab)
-if BM then
-return BM
+BR=self.fileObject.get_files.first(Du,p)
+BS=self.fileObject.get_folders.first(Du,p)
+if BR then
+return BR
 end if
-if BN then
-return BN
+if BS then
+return BS
 end if
-return EU
+return EE
 end function
-Ap.accessCheck=function(AX,BM)
-if BM.has_permission(EM) or BM.has_permission(EN) or BM.has_permission(EO) or BM.owner==self.getPerms then
-return AX.listFile(BM)+char(10)
+Au.accessCheck=function(Ae,BR)
+if BR.has_permission(EX) or BR.has_permission(EY) or BR.has_permission(EZ) or BR.owner==self.getPerms then
+return Ae.listFile(BR)+char(Ei)
 end if
 end function
-Ap.treeAction=function(BM,BO)
-if BM==EI then
+Au.treeAction=function(BR,BT)
+if BR==ET then
 self.toRoot
-BM=self.fileObject
+BR=self.fileObject
 end if
-if typeof(BM)!=Dk then
+if typeof(BR)!=Dt then
 return "Invalid argument."
 end if
-Z=Dw
-Z=Z+BO(self,BM)
-for S in BM.get_files
-Z=Z+BO(self,S)
+a=EG
+a=a+BT(self,BR)
+for T in BR.get_files
+a=a+BT(self,T)
 end for
-for S in BM.get_folders
-Z=Z+self.treeAction(S,@BO)
+for T in BR.get_folders
+a=a+self.treeAction(T,@BT)
 end for
-return Z
+return a
 end function
-Ap.readFile=function(Ab)
-BM=self.fileObject.get_files.first(Dl,Ab)
-if not BM then
-return j.create(Ab)
+Au.readFile=function(p)
+BR=self.fileObject.get_files.first(Du,p)
+if not BR then
+return q.create(p)
 end if
-Z=BM.get_content
-if not Z then
-return k.create(Ab)
+a=BR.get_content
+if not a then
+return r.create(p)
 else
-return Z
+return a
 end if
 end function
-Ap.writeFile=function(Ab,BP)
-BM=self.fileObject.get_files.first(Dl,Ab)
-if not BM then
-return j.create(Ab)
+Au.writeFile=function(p,BU)
+BR=self.fileObject.get_files.first(Du,p)
+if not BR then
+return q.create(p)
 end if
-Z=BM.set_content(BP)
-if Z!=Dz then
-return l.create(Ab,Z)
+a=BR.set_content(BU)
+if a!=EF then
+return s.create(p,a)
 else
 return "Content written."
 end if
 end function
-Ap.deleteFile=function(Ab)
-BM=self.checkFile(Ab)
-if not BM then
-return j.create(Ab)
+Au.deleteFile=function(p)
+BR=self.checkFile(p)
+if not BR then
+return q.create(p)
 end if
-Z=BM.delete
-if Z.trim.len!=EJ then
-return n.create(Ab,Z)
+a=BR.delete
+if a.trim.len!=ER then
+return u.create(p,a)
 else
 return "File deleted."
 end if
 end function
-Ap.changeFile=function(BQ)
-BR=BQ.split(EI)
-if BQ[EJ]==EI then
+Au.changeFile=function(BV)
+BW=BV.split(ET)
+if BV[ER]==ET then
 self.toRoot
 end if
-for S in BR
-if S.trim.len==EJ or S==EP then
+for T in BW
+if T.trim.len==ER or T==EV then
 continue
 end if
-if S==".." then
+if T==".." then
 if self.fileObject.parent then
 self.fileObject=self.fileObject.parent
 else
-return c.create("Cannot go up. If you aren't in /, cwd may have been deleted.")
+return j.create("Cannot go up. If you aren't in /, cwd may have been deleted.")
 end if
 else
-if not self.checkFile(S) then
-return j.create(S)
+if not self.checkFile(T) then
+return q.create(T)
 end if
-self.fileObject=self.fileObject.get_folders.first(Dl,S)
+self.fileObject=self.fileObject.get_folders.first(Du,T)
 end if
 end for
 end function
-Ap.moveFile=function(Ab,BS,BT)
-BM=self.checkFile(Ab)
-if not BM then
-return j.create(Ab)
+Au.moveFile=function(p,BX,BY)
+BR=self.checkFile(p)
+if not BR then
+return q.create(p)
 end if
-Z=BM.move(BS,BT)
-if Z!=Dz then
-return q.create(Ab,BS,Z)
+a=BR.move(BX,BY)
+if a!=EF then
+return x.create(p,BX,a)
 else
 return "File moved."
 end if
 end function
-Ap.copyFile=function(Ab,BS,BT)
-BM=self.checkFile(Ab)
-if not BM then
-return j.create(Ab)
+Au.copyFile=function(p,BX,BY)
+BR=self.checkFile(p)
+if not BR then
+return q.create(p)
 end if
-Z=BM.copy(BS,BT)
-if Z!=Dz then
-return o.create(Ab,BS,Z)
+a=BR.copy(BX,BY)
+if a!=EF then
+return v.create(p,BX,a)
 else
 return "File copied."
 end if
 end function
-Ap.getTextFile=function(Ab)
-BU=self.readFile(Ab)
-if BU isa k then
-return BU
+Au.getTextFile=function(p)
+BZ=self.readFile(p)
+if BZ isa r then
+return BZ
 end if
-AJ.vexxed[EK].host_computer.touch(ET,Ab)
-AJ.vexxed[EK].host_computer.File(ET+Ab).set_content(BU)
-return "File copied to /root/Loot/"+Ab
+AQ.vexxed[EU].host_computer.touch(Ed,p)
+AQ.vexxed[EU].host_computer.File(Ed+p).set_content(BZ)
+return "File copied to /root/Loot/"+p
 end function
-Ap.getLANIP=function
+Au.getLANIP=function
 return "N/A"
 end function
-Ap.getPubIP=function
+Au.getPubIP=function
 return "N/A"
 end function
-Ap.getPerms=function
+Au.getPerms=function
 self.toRoot
-BV=self.fileObject.get_folders.first(Dn,"/root")
-if BV and BV.has_permission(EM) and BV.has_permission(EN) and BV.has_permission(EO) then
+Ba=self.fileObject.get_folders.first(Dw,"/root")
+if Ba and Ba.has_permission(EX) and Ba.has_permission(EY) and Ba.has_permission(EZ) then
 return "root"
 end if
-BW=self.fileObject.get_folders.first(Dn,"/home")
-if BW then
-BX=BW.get_folders.wherenot(Dn,"/home/guest")
-if BX then
-for S in BX
-if S.has_permission(EM) and S.has_permission(EN) and S.has_permission(EO) then
+Bb=self.fileObject.get_folders.first(Dw,"/home")
+if Bb then
+Bc=Bb.get_folders.wherenot(Dw,"/home/guest")
+if Bc then
+for T in Bc
+if T.has_permission(EX) and T.has_permission(EY) and T.has_permission(EZ) then
 return "user"
 end if
 end for
@@ -885,801 +920,801 @@ end if
 end if
 return "guest"
 end function
-Ap.toRoot=function
+Au.toRoot=function
 while parent(self.fileObject)
-Z=self.changeFile("..")
-if Z isa c then
-return Z
+a=self.changeFile("..")
+if a isa j then
+return a
 end if
 end while
 end function
-Ap.changePerms=function(Ab,BY,BZ=0)
-if Ab==EP then
-BM=self.fileObject
+Au.changePerms=function(p,Bd,Be=0)
+if p==EV then
+BR=self.fileObject
 else
-BM=self.checkFile(Ab)
+BR=self.checkFile(p)
 end if
-if not BM then
-return j.create(Ab)
+if not BR then
+return q.create(p)
 end if
-Z=BM.chmod("u-rwx",BZ)
-if Z.trim.len!=EJ then
-return r.create(Ab,BY,Z)
+a=BR.chmod("u-rwx",Be)
+if a.trim.len!=ER then
+return y.create(p,Bd,a)
 end if
-BM.chmod("g-rwx",BZ)
-BM.chmod("o-rwx",BZ)
-Ba=BY[EJ].to_int
-Bb=BY[EG].to_int
-Bc=BY[EL].to_int
-Bd="u+"
-if bitAnd(Ba,4) then
-Bd=Bd+EM
+BR.chmod("g-rwx",Be)
+BR.chmod("o-rwx",Be)
+Bf=Bd[ER].to_int
+Bg=Bd[EJ].to_int
+Bh=Bd[EW].to_int
+Bi="u+"
+if bitAnd(Bf,4) then
+Bi=Bi+EX
 end if
-if bitAnd(Ba,EL) then
-Bd=Bd+EN
+if bitAnd(Bf,EW) then
+Bi=Bi+EY
 end if
-if bitAnd(Ba,EG) then
-Bd=Bd+EO
+if bitAnd(Bf,EJ) then
+Bi=Bi+EZ
 end if
-Be="g+"
-if bitAnd(Bb,4) then
-Be=Be+EM
+Bj="g+"
+if bitAnd(Bg,4) then
+Bj=Bj+EX
 end if
-if bitAnd(Bb,EL) then
-Be=Be+EN
+if bitAnd(Bg,EW) then
+Bj=Bj+EY
 end if
-if bitAnd(Bb,EG) then
-Be=Be+EO
+if bitAnd(Bg,EJ) then
+Bj=Bj+EZ
 end if
-Bf="o+"
-if bitAnd(Bc,4) then
-Bf=Bf+EM
+Bk="o+"
+if bitAnd(Bh,4) then
+Bk=Bk+EX
 end if
-if bitAnd(Bc,EL) then
-Bf=Bf+EN
+if bitAnd(Bh,EW) then
+Bk=Bk+EY
 end if
-if bitAnd(Bc,EG) then
-Bf=Bf+EO
+if bitAnd(Bh,EJ) then
+Bk=Bk+EZ
 end if
-BM.chmod(Bd,BZ)
-BM.chmod(Be,BZ)
-BM.chmod(Bf,BZ)
+BR.chmod(Bi,Be)
+BR.chmod(Bj,Be)
+BR.chmod(Bk,Be)
 return "Permissions changed."
 end function
-Ap.changeGroup=function(Ab,Bg,BZ=0)
-if Ab!=EP then
-BM=self.fileObject.get_files.first(Dl,Ab)
+Au.changeGroup=function(p,Bl,Be=0)
+if p!=EV then
+BR=self.fileObject.get_files.first(Du,p)
 else
-BM=self.fileObject
+BR=self.fileObject
 end if
-if not BM then
-return j.create(Ab)
+if not BR then
+return q.create(p)
 end if
-Z=BM.set_group(Bg,BZ)
-if Z.trim.len!=EJ then
-return s.create(Ab,Bg,Z)
+a=BR.set_group(Bl,Be)
+if a.trim.len!=ER then
+return z.create(p,Bl,a)
 else
 return "Group changed."
 end if
 end function
-Ap.changeOwner=function(Ab,Bh,BZ=0)
-if Ab!=EP then
-BM=self.fileObject.get_files.first(Dl,Ab)
+Au.changeOwner=function(p,Bm,Be=0)
+if p!=EV then
+BR=self.fileObject.get_files.first(Du,p)
 else
-BM=self.fileObject
+BR=self.fileObject
 end if
-if not BM then
-return j.create(Ab)
+if not BR then
+return q.create(p)
 end if
-Z=BM.set_owner(Bh,BZ)
-if Z.trim.len!=EJ then
-return t.create(Ab,Bh,Z)
+a=BR.set_owner(Bm,Be)
+if a.trim.len!=ER then
+return _A.create(p,Bm,a)
 else
 return "Owner changed."
 end if
 end function
-Ap.logWipe=function
+Au.logWipe=function
 if self.getPerms!="root" then
 return "Root permissions required."
 end if
-Z=self.toRoot
-if Z isa c then
-return Z
+a=self.toRoot
+if a isa j then
+return a
 end if
-Z=self.changeFile("etc")
-if Z isa c then
-return Z
+a=self.changeFile("etc")
+if a isa j then
+return a
 end if
-Z=self.writeFile(EQ,"rosebud")
-if Z isa c then
-return Z
+a=self.writeFile(Ea,"rosebud")
+if a isa j then
+return a
 end if
-Z=self.copyFile(EQ,"/var/","system.log")
-if Z isa c then
-return Z
+a=self.copyFile(Ea,"/var/","system.log")
+if a isa j then
+return a
 end if
-self.writeFile(EQ,Dw)
+self.writeFile(Ea,EG)
 return "Logs wiped."
 end function
-Ap.genUID=function
+Au.genUID=function
 self.UID=md5(str(rnd+rnd+rnd+rnd))
 end function
-Ap.handleInput=function(An)
-if An.len==EJ or not self.inputMap.hasMethod(An[EJ]) then
+Au.handleInput=function(As)
+if As.len==ER or not self.inputMap.hasMethod(As[ER]) then
 return 
 end if
-Ao=@self.inputMap[An[EJ]]
-return Ao(self,An)
+At=@self.inputMap[As[ER]]
+return At(self,As)
 end function
-Bi=new Ap
-Bi.computerObject=D_
-Bi.classID="ComputerHandler"
-Bi.displayID="Computer"
-Bi.inputMap=new Ap.inputMap
-Bi.inputMap["ps"]=function(AX,AY)
-return AX.getProcesses
+Bn=new Au
+Bn.computerObject=EK
+Bn.classID="ComputerHandler"
+Bn.displayID="Computer"
+Bn.inputMap=new Au.inputMap
+Bn.inputMap["ps"]=function(Ae,Af)
+return Ae.getProcesses
 end function
-Bi.inputMap["ifconfig"]=function(AX,AY)
-return AX.netInfo
+Bn.inputMap["ifconfig"]=function(Ae,Af)
+return Ae.netInfo
 end function
-Bi.inputMap["kill"]=function(AX,AY)
-if AY.len>EG then
-return AX.closeProcess(AY[EG].to_int)
+Bn.inputMap["kill"]=function(Ae,Af)
+if Af.len>EJ then
+return Ae.closeProcess(Af[EJ].to_int)
 else
 return "Usage: kill [pid]"
 end if
 end function
-Bi.inputMap["useradd"]=function(AX,AY)
-if AY.len>EL then
-return AX.userAdd(AY[EG],AY[EL])
+Bn.inputMap["useradd"]=function(Ae,Af)
+if Af.len>EW then
+return Ae.userAdd(Af[EJ],Af[EW])
 else
 return "Usage: useradd [username] [password]"
 end if
 end function
-Bi.inputMap["passwd"]=function(AX,AY)
-if AY.len>EL then
-return AX.changePass(AY[EG],AY[EL])
+Bn.inputMap["passwd"]=function(Ae,Af)
+if Af.len>EW then
+return Ae.changePass(Af[EJ],Af[EW])
 else
 return "Usage: passwd [username] [password]"
 end if
 end function
-Bi.inputMap["touch"]=function(AX,AY)
-if AY.len>EG then
-return AX.createFile(AX.fileObject.path,AY[EG])
+Bn.inputMap["touch"]=function(Ae,Af)
+if Af.len>EJ then
+return Ae.createFile(Ae.fileObject.path,Af[EJ])
 else
 return "Usage: touch [filename]"
 end if
 end function
-Bi.inputMap["mkdir"]=function(AX,AY)
-if AY.len>EG then
-return AX.createFolder(AX.fileObject.path,AY[EG])
+Bn.inputMap["mkdir"]=function(Ae,Af)
+if Af.len>EJ then
+return Ae.createFolder(Ae.fileObject.path,Af[EJ])
 else
 return "Usage: mkdir [foldername]"
 end if
 end function
-Bi.inputMap["iwlist"]=function(AX,AY)
-if AY.len>EG then
-return AX.getWiFiObjects(AY[EG])
+Bn.inputMap["iwlist"]=function(Ae,Af)
+if Af.len>EJ then
+return Ae.getWiFiObjects(Af[EJ])
 else
 return "Usage: iwlist [interface]"
 end if
 end function
-Bi.getObject=function
+Bn.getObject=function
 return self.computerObject
 end function
-Bi.updateComputerObject=function(Bj)
-self.computerObject=Bj
+Bn.updateComputerObject=function(Bo)
+self.computerObject=Bo
 if self.fileObject then
-self.updateFileObject(Bj.File(self.fileObject.path))
+self.updateFileObject(Bo.File(self.fileObject.path))
 else
-self.updateFileObject(Bj.File(EI))
+self.updateFileObject(Bo.File(ET))
 end if
 end function
-Bi.getProcesses=function
+Bn.getProcesses=function
 return self.computerObject.show_procs
 end function
-Bi.closeProcess=function(x)
-Z=self.computerObject.close_program(x)
-if Z!=Dz then
-return w.create(x,Z)
+Bn.closeProcess=function(AE)
+a=self.computerObject.close_program(AE)
+if a!=EF then
+return AD.create(AE,a)
 end if
 end function
-Bi.userAdd=function(z,_A)
-Z=self.computerObject.create_user(z,_A)
-if Z!=Dz then
-return y.create(z,_A,Z)
+Bn.userAdd=function(AG,AH)
+a=self.computerObject.create_user(AG,AH)
+if a!=EF then
+return AF.create(AG,AH,a)
 end if
 end function
-Bi.changePass=function(z,_A)
-Z=self.computerObject.change_password(z,_A)
-if Z!=Dz then
-return Bv.create(z,_A,Z)
+Bn.changePass=function(AG,AH)
+a=self.computerObject.change_password(AG,AH)
+if a!=EF then
+return B_.create(AG,AH,a)
 end if
 end function
-Bi.createFile=function(path,Ab)
-Z=self.computerObject.touch(path,Ab)
-if Z!=Dz then
-return AD.create(path,Ab,Z)
+Bn.createFile=function(path,p)
+a=self.computerObject.touch(path,p)
+if a!=EF then
+return AK.create(path,p,a)
 end if
 end function
-Bi.createFolder=function(path,BN)
-Z=self.computerObject.create_folder(path,BN)
-if Z!=Dz then
-return AF.create(path,BN,Z)
+Bn.createFolder=function(path,BS)
+a=self.computerObject.create_folder(path,BS)
+if a!=EF then
+return AM.create(path,BS,a)
 end if
 end function
-Bi.netInfo=function
+Bn.netInfo=function
 return "Local IP: "+self.getLANIP+"\nPublic IP: "+self.getPubIP+"\nActive card: "+self.getActiveCard+"\nInterfaces:\n"+self.getInterfaces
 end function
-Bi.getActiveCard=function
+Bn.getActiveCard=function
 return self.computerObject.active_net_card
 end function
-Bi.getInterfaces=function
+Bn.getInterfaces=function
 return format_columns(self.computerObject.network_devices)
 end function
-Bi.getWiFiObjects=function(AI)
-Bw=self.computerObject.wifi_networks(AI)
-if Bw==D_ then
-return AH.create(AI)
+Bn.getWiFiObjects=function(AP)
+CA=self.computerObject.wifi_networks(AP)
+if CA==EK then
+return AO.create(AP)
 end if
-Bx="BSSID PWR ESSID"
-for By in Bw
-Bx=Bx+ER+By
+CB="BSSID PWR ESSID"
+for CC in CA
+CB=CB+Eb+CC
 end for
-return format_columns(Bx)
+return format_columns(CB)
 end function
-Bi.getLANIP=function
+Bn.getLANIP=function
 return self.computerObject.local_ip
 end function
-Bi.getPubIP=function
+Bn.getPubIP=function
 return self.computerObject.public_ip
 end function
-Bz=new Bi
-Bz.shellObject=D_
-Bz.classID="ShellHandler"
-Bz.displayID="Shell"
-Bz.inputMap=new Bi.inputMap
-Bz.inputMap[Ea]=function(AX,AY)
-AX.dropShell
+CD=new Bn
+CD.shellObject=EK
+CD.classID="ShellHandler"
+CD.displayID="Shell"
+CD.inputMap=new Bn.inputMap
+CD.inputMap[Ek]=function(Ae,Af)
+Ae.dropShell
 end function
-Bz.inputMap["get"]=function(AX,AY)
-if AY.len>EG then
-return AX.getFile(AY[EG])
+CD.inputMap["get"]=function(Ae,Af)
+if Af.len>EJ then
+return Ae.getFile(Af[EJ])
 else
 return "Usage: get [filename]"
 end if
 end function
-Bz.inputMap["put"]=function(AX,AY)
-if AY.len>EG then
-return AX.putFile(AY[EG])
+CD.inputMap["put"]=function(Ae,Af)
+if Af.len>EJ then
+return Ae.putFile(Af[EJ])
 else
 return "Usage: put [filepath]"
 end if
 end function
-Bz.inputMap["build"]=function(AX,AY)
-if AY.len>ES then
-return AX.buildFile(AY[EG],AY[EL],AY[ES])
+CD.inputMap["build"]=function(Ae,Af)
+if Af.len>Ec then
+return Ae.buildFile(Af[EJ],Af[EW],Af[Ec])
 else
 return "Usage: build [srcPath] [binPath] [canImport]"
 end if
 end function
-Bz.inputMap["launch"]=function(AX,AY)
-if AY.len==EL then
-return AX.launchFile(AY[EG],Dw)
+CD.inputMap["launch"]=function(Ae,Af)
+if Af.len==EW then
+return Ae.launchFile(Af[EJ],EG)
 end if
-if AY.len>EL then
-return AX.launchFile(AY[EG],AY[EL:].join(EH))
+if Af.len>EW then
+return Ae.launchFile(Af[EJ],Af[EW:].join(ES))
 else
 return "Usage: launch [filePath] [args]"
 end if
 end function
-Bz.inputMap["sudo"]=function(AX,AY)
-if AY.len==EG then
-return AX.trySudo(Dw,Dw)
+CD.inputMap["sudo"]=function(Ae,Af)
+if Af.len==EJ then
+return Ae.trySudo(EG,EG)
 end if
-if AY.len>EL then
-return AX.trySudo(AY[EG],AY[EL])
+if Af.len>EW then
+return Ae.trySudo(Af[EJ],Af[EW])
 else
 return "Usage: sudo [username] [password]"
 end if
 end function
-Bz.inputMap["jump"]=function(AX,AY)
-AX.jumpTo
+CD.inputMap["jump"]=function(Ae,Af)
+Ae.jumpTo
 end function
-Bz.inputMap["connect"]=function(AX,AY)
-if AY.len>5 then
-return AX.connectService(AY[EG],AY[EL].to_int,AY[ES],AY[4],AY[5].to_int)
+CD.inputMap["connect"]=function(Ae,Af)
+if Af.len>5 then
+return Ae.connectService(Af[EJ],Af[EW].to_int,Af[Ec],Af[4],Af[5].to_int)
 end if
-if AY.len>4 then
-return AX.connectService(AY[EG],AY[EL].to_int,AY[ES],AY[4])
+if Af.len>4 then
+return Ae.connectService(Af[EJ],Af[EW].to_int,Af[Ec],Af[4])
 else
 return "Usage: connect [ip] [port] [username] [password] [isFTP=0]"
 end if
 end function
-Bz.getObject=function
+CD.getObject=function
 return self.shellObject
 end function
-Bz.updateShellObject=function(B_)
-self.shellObject=B_
+CD.updateShellObject=function(CE)
+self.shellObject=CE
 self.updateComputerObject(host_computer(self.shellObject))
 end function
-Bz.dropShell=function
+CD.dropShell=function
 start_terminal(self.shellObject)
 end function
-Bz.getFile=function(Ab)
-CJ=self.fileObject.path+EI+Ab
-Z=scp(self.shellObject,CJ,ET,AJ.vexxed[EK])
-if Z!=Dz then
-return "Error downloading file: "+Z
+CD.getFile=function(p)
+CO=self.fileObject.path+ET+p
+a=scp(self.shellObject,CO,Ed,AQ.vexxed[EU])
+if a!=EF then
+return "Error downloading file: "+a
 end if
 end function
-Bz.putFile=function(BS)
-Z=scp(AJ.vexxed[EK],BS,self.fileObject.path,self.shellObject)
-if Z!=Dz then
-return "Error uploading file: "+Z
+CD.putFile=function(BX)
+a=scp(AQ.vexxed[EU],BX,self.fileObject.path,self.shellObject)
+if a!=EF then
+return "Error uploading file: "+a
 end if
 end function
-Bz.trySudo=function(CK,CL)
-if CK.trim.len==EJ and CL.trim.len==EJ then
-Z=get_shell
+CD.trySudo=function(CP,CQ)
+if CP.trim.len==ER and CQ.trim.len==ER then
+a=get_shell
 else
-Z=get_shell(CK,CL)
+a=get_shell(CP,CQ)
 end if
-if not Z then
+if not a then
 return "User/pass combo incorrect. Remember, this only works on the current remoteShell."
 end if
-CM=new Bz
-CM.updateShellObject(Z)
-AJ.vexxed[EF].addHandler(CM)
+CR=new CD
+CR.updateShellObject(a)
+AQ.vexxed[EQ].addHandler(CR)
 end function
-Bz.buildFile=function(CN,CO,CP)
-Z=build(self.shellObject,CN,CO,CP)
-if Z!=Dw then
-print("Error building file: "+Z)
+CD.buildFile=function(CS,CT,CU)
+a=build(self.shellObject,CS,CT,CU)
+if a!=EG then
+print("Error building file: "+a)
 end if
 end function
-Bz.launchFile=function(BS,AY)
-Z=launch(self.shellObject,BS,AY)
-print("Successfuly launched: "+Z)
+CD.launchFile=function(BX,Af)
+a=launch(self.shellObject,BX,Af)
+print("Successfuly launched: "+a)
 end function
-Bz.jumpTo=function
+CD.jumpTo=function
 self.putFile("/root/Vexxed/vexxed")
 self.putFile("/root/Vexxed/metaxploit.so")
 self.putFile("/root/Vexxed/crypto.so")
-self.launchFile(self.fileObject.path+"/vexxed",Dw)
+self.launchFile(self.fileObject.path+"/vexxed",EG)
 end function
-Bz.connectService=function(CQ,CR,z,CL,CS=false)
-if CS then
-CT="ftp"
+CD.connectService=function(CV,CW,AG,CQ,CX=false)
+if CX then
+CY="ftp"
 else
-CT="ssh"
+CY="ssh"
 end if
-Z=connect_service(self.shellObject,CQ,CR,z,CL,CT)
-if Z isa string then
-print("Error connecting to service: "+Z)
+a=connect_service(self.shellObject,CV,CW,AG,CQ,CY)
+if a isa string then
+print("Error connecting to service: "+a)
 end if
-if typeof(Z)==Ea or typeof(Z)=="ftpshell" then
-CM=new Bz
-CM.updateShellObject(Z)
-AJ.vexxed[EF].addHandler(CM)
+if typeof(a)==Ek or typeof(a)=="ftpshell" then
+CR=new CD
+CR.updateShellObject(a)
+AQ.vexxed[EQ].addHandler(CR)
 end if
 end function
-CU={}
-CU.inputMap={}
-CU.inputMap["whois"]=function(AX,AY)
-if AY.len>EG then
-return CU.whoIs(AY[EG])
+CZ={}
+CZ.inputMap={}
+CZ.inputMap["whois"]=function(Ae,Af)
+if Af.len>EJ then
+return CZ.whoIs(Af[EJ])
 else
 return "Usage: whois [domain]"
 end if
 end function
-CU.inputMap["smtpdump"]=function(AX,AY)
-if AY.len>EL then
-return CU.smtpDump(AY[EG],AY[EL].to_int)
+CZ.inputMap["smtpdump"]=function(Ae,Af)
+if Af.len>EW then
+return CZ.smtpDump(Af[EJ],Af[EW].to_int)
 else
 return "Usage: smtpdump [ip] [port]"
 end if
 end function
-CU.inputMap["info"]=function(AX,AY)
-if AY.len>EG then
-return CU.fullEnumerate(AY[EG])
+CZ.inputMap["info"]=function(Ae,Af)
+if Af.len>EJ then
+return CZ.fullEnumerate(Af[EJ])
 else
 return "Usage: info [domain/ip]"
 end if
 end function
-CU.whoIs=function(CY)
-CZ=Dw
-if not is_valid_ip(CY) then
-CZ=nslookup(CY)
-print("Address: "+CZ)
+CZ.whoIs=function(Cd)
+Ce=EG
+if not is_valid_ip(Cd) then
+Ce=nslookup(Cd)
+print("Address: "+Ce)
 else
-CZ=CY
+Ce=Cd
 end if
-print(whois(CZ))
+print(whois(Ce))
 end function
-CU.smtpDump=function(CQ,CR)
-Z=AJ.vexxed[ED].smtp_user_list(CQ,CR)
-if typeof(Z)==Dg then
-return Z
+CZ.smtpDump=function(CV,CW)
+a=AQ.vexxed[EO].smtp_user_list(CV,CW)
+if typeof(a)==Dp then
+return a
 end if
-print("Users found: "+Z.join(", "))
+print("Users found: "+a.join(", "))
 end function
-CU.fullEnumerate=function(CQ)
-print("whois "+CQ+EZ)
-CU.whoIs(CQ)
-if not is_valid_ip(CQ) then
-CQ=nslookup(CQ)
+CZ.fullEnumerate=function(CV)
+print("whois "+CV+Ej)
+CZ.whoIs(CV)
+if not is_valid_ip(CV) then
+CV=nslookup(CV)
 end if
-Ca=get_router(CQ)
-if Ca==D_ then
+Cf=get_router(CV)
+if Cf==EK then
 return "Router not found."
 end if
-print("\nRouter LAN address: "+Ca.local_ip)
-print("Router BSSID: "+Ca.bssid_name)
-print("Router ESSID: "+Ca.essid_name)
+print("\nRouter LAN address: "+Cf.local_ip)
+print("Router BSSID: "+Cf.bssid_name)
+print("Router ESSID: "+Cf.essid_name)
 print("\nPort-forwards detected: ")
-for CR in Ca.used_ports
-print(CR.port_number+"  open:"+(not CR.is_closed)+EV+Ca.port_info(CR)+EV+CR.get_lan_ip)
+for CW in Cf.used_ports
+print(CW.port_number+"  open:"+(not CW.is_closed)+Ee+Cf.port_info(CW)+Ee+CW.get_lan_ip)
 end for
 print("\nFirewall rules: ")
-for Cb in Ca.firewall_rules
-print(Cb)
+for Cg in Cf.firewall_rules
+print(Cg)
 end for
 print("\nLocal IPs detected: ")
-for Cc in Ca.devices_lan_ip
-print("\nLAN: "+Cc)
+for Ch in Cf.devices_lan_ip
+print("\nLAN: "+Ch)
 print("Ports detected: ")
-Cd=Ca.device_ports(Cc)
-if typeof(Cd)==Dg then
-print(Cd)
+Ci=Cf.device_ports(Ch)
+if typeof(Ci)==Dp then
+print(Ci)
 continue
 end if
-for CR in Cd
-print(CR.port_number+"  open:"+(not CR.is_closed)+EV+Ca.port_info(CR)+EV+CR.get_lan_ip)
+for CW in Ci
+print(CW.port_number+"  open:"+(not CW.is_closed)+Ee+Cf.port_info(CW)+Ee+CW.get_lan_ip)
 end for
 end for
 end function
-CU.handleInput=function(An)
-if An.len==EJ or not self.inputMap.hasMethod(An[EJ]) then
+CZ.handleInput=function(As)
+if As.len==ER or not self.inputMap.hasMethod(As[ER]) then
 return 
 end if
-Ao=@self.inputMap[An[EJ]]
-return Ao(self,An)
+At=@self.inputMap[As[ER]]
+return At(self,As)
 end function
-Al={}
-Al.scanResult={}
-Al.metaLibs={}
-Al.inputMap={}
-Al.inputMap["scan"]=function(AX,AY)
-if AY.len<ES then
+Aq={}
+Aq.scanResult={}
+Aq.metaLibs={}
+Aq.inputMap={}
+Aq.inputMap["scan"]=function(Ae,Af)
+if Af.len<Ec then
 return "Usage: scan [ip] [port]"
 end if
-Cq=AX.scanPort(AY[EG],AY[EL].to_int)
-if not Cq then
+Cv=Ae.scanPort(Af[EJ],Af[EW].to_int)
+if not Cv then
 return "Library was unable to be scanned."
 else
-return AJ.vexxed[EF].setCurrLib(Cq)
+return AQ.vexxed[EQ].setCurrLib(Cv)
 end if
 end function
-Al.inputMap["load"]=function(AX,AY)
-if AY.len<EL then
+Aq.inputMap["load"]=function(Ae,Af)
+if Af.len<EW then
 return "Usage: load [path]"
 end if
-Cq=AX.scanLib(AX.loadLib(AY[EG]))
-if not Cq then
+Cv=Ae.scanLib(Ae.loadLib(Af[EJ]))
+if not Cv then
 return "Library was unable to be loaded."
 else
-return AJ.vexxed[EF].setCurrLib(Cq)
+return AQ.vexxed[EQ].setCurrLib(Cv)
 end if
 end function
-Al.inputMap["local"]=function(AX,AY)
-if AY.len<ES then
+Aq.inputMap["local"]=function(Ae,Af)
+if Af.len<Ec then
 return "Usage: local [path] [optVal]"
 end if
-Z=AX.inputMap.load(AX,AY)
-if Z then
-return Z
+a=Ae.inputMap.load(Ae,Af)
+if a then
+return a
 end if
-AX.crackLib(AJ.vexxed[EF].currLib,AY[EL])
-AX.printVulns(AJ.vexxed[EF].currLib)
+Ae.crackLib(AQ.vexxed[EQ].currLib,Af[EW])
+Ae.printVulns(AQ.vexxed[EQ].currLib)
 end function
-Al.inputMap["crack"]=function(AX,AY)
-if AY.len<EL then
+Aq.inputMap["crack"]=function(Ae,Af)
+if Af.len<EW then
 return "Usage: crack [hash/file]"
 end if
-return AX.crackHash(AY[EG])
+return Ae.crackHash(Af[EJ])
 end function
-Al.inputMap["target"]=function(AX,AY)
-if AY.len<4 then
+Aq.inputMap["target"]=function(Ae,Af)
+if Af.len<4 then
 return "Usage: target [ip] [port] [optVal]"
 end if
-Z=AX.inputMap.scan(AX,AY)
-if Z then
-return Z
+a=Ae.inputMap.scan(Ae,Af)
+if a then
+return a
 end if
-AX.crackLib(AJ.vexxed[EF].currLib,AY[ES])
-AX.printVulns(AJ.vexxed[EF].currLib)
+Ae.crackLib(AQ.vexxed[EQ].currLib,Af[Ec])
+Ae.printVulns(AQ.vexxed[EQ].currLib)
 end function
-Al.scanParse=function(Cr)
-Cs=EU
-Ct=[]
-Cu=Cr.split(EH)
-Cu.reverse
-for Cv in Cu
-if Cs==Dz then
-Cv=Cv.remove(EP)
-Cv=Cv.remove("<b>")
-Cv=Cv.remove("</b>")
-Ct.push(Cv)
-Cs=EU
+Aq.scanParse=function(Cw)
+Cx=EE
+Cy=[]
+Cz=Cw.split(ES)
+Cz.reverse
+for C_ in Cz
+if Cx==EF then
+C_=C_.remove(EV)
+C_=C_.remove("<b>")
+C_=C_.remove("</b>")
+Cy.push(C_)
+Cx=EE
 end if
-if Cv=="Buffer" then
-Cs=Dz
+if C_=="Buffer" then
+Cx=EF
 end if
 end for
-return Ct
+return Cy
 end function
-Al.loadLib=function(BS)
-Cw=AJ.vexxed[EC].load(BS)
-if Cw then
-return Cw
+Aq.loadLib=function(BX)
+DA=AQ.vexxed[EN].load(BX)
+if DA then
+return DA
 end if
 print("Library was unable to be loaded.")
 end function
-Al.scanLib=function(Cw)
-Cq=Cw.lib_name+"-"+Cw.version
-self.metaLibs[Cq]=Cw
-if self.scanResult.hasIndex(Cq) then
-return Cq
+Aq.scanLib=function(DA)
+Cv=DA.lib_name+"-"+DA.version
+self.metaLibs[Cv]=DA
+if self.scanResult.hasIndex(Cv) then
+return Cv
 end if
-self.scanResult[Cq]={}
-Cx=AJ.vexxed[EW].scan(Cw)
-for Cy in Cx
-print("Scanning memory: "+Cy)
-self.scanResult[Cq][Cy]=self.scanParse(AJ.vexxed[EW].scan_address(Cw,Cy))
+self.scanResult[Cv]={}
+DB=AQ.vexxed[Ef].scan(DA)
+for DC in DB
+print("Scanning memory: "+DC)
+self.scanResult[Cv][DC]=self.scanParse(AQ.vexxed[Ef].scan_address(DA,DC))
 end for
 self.saveResult
-return Cq
+return Cv
 end function
-Al.crackHash=function(hash)
-BM=AJ.vexxed[EF].currHandler.checkFile(hash)
-if not BM then
-return AJ.vexxed[EX].decipher(hash)
+Aq.crackHash=function(hash)
+BR=AQ.vexxed[EQ].currHandler.checkFile(hash)
+if not BR then
+return AQ.vexxed[Eg].decipher(hash)
 end if
-if BM.is_folder then
-return c.create("Error: cannot crack a folder.")
+if BR.is_folder then
+return j.create("Error: cannot crack a folder.")
 end if
-Z=BM.get_content
-if not Z then
-return k.create(Ab)
+a=BR.get_content
+if not a then
+return r.create(p)
 end if
-Cz=Z.split(char(10))
-Bx="User Password"
-for C_ in Cz
-C_=C_.trim
-if C_.len<33 then
+DD=a.split(char(Ei))
+CB="User Password"
+for DE in DD
+DE=DE.trim
+if DE.len<33 then
 continue
 end if
-DA=C_.split(EZ)
-DB=decipher(AJ.vexxed[EX],DA[EG])
-Bx=Bx+ER+DA[EJ]+EH+DB
+DF=DE.split(Ej)
+DG=decipher(AQ.vexxed[Eg],DF[EJ])
+CB=CB+Eb+DF[ER]+ES+DG
 end for
-return format_columns(Bx)
+return format_columns(CB)
 end function
-Al.loadRemoteLib=function(CQ,CR)
-DC=AJ.vexxed[EC].net_use(CQ,CR)
-if DC then
-return DC.dump_lib
+Aq.loadRemoteLib=function(CV,CW)
+DH=AQ.vexxed[EN].net_use(CV,CW)
+if DH then
+return DH.dump_lib
 end if
 print("Remote library was unable to be loaded.")
 end function
-Al.scanPort=function(CQ,CR)
-Cw=self.loadRemoteLib(CQ,CR)
-if not Cw then
+Aq.scanPort=function(CV,CW)
+DA=self.loadRemoteLib(CV,CW)
+if not DA then
 return 
 end if
-self.scanLib(Cw)
-return Cw.lib_name+"-"+Cw.version
+self.scanLib(DA)
+return DA.lib_name+"-"+DA.version
 end function
-Al.saveResult=function
-X=AJ.vexxed[EK].host_computer
-if not X.File(EY) then
-X.touch("/root/Vexxed","payloads.db")
+Aq.saveResult=function
+Y=AQ.vexxed[EU].host_computer
+if not Y.File(Eh) then
+Y.touch("/root/Vexxed","payloads.db")
 end if
-DD=X.File(EY)
-DE=Dw
-for Cq in self.scanResult.indexes
-DE=DE+Cq+"|"
-DF=[]
-for Cy in self.scanResult[Cq].indexes
-values=self.scanResult[Cq][Cy].join(",")
-DF.push(Cy+EZ+values)
+DI=Y.File(Eh)
+DJ=EG
+for Cv in self.scanResult.indexes
+DJ=DJ+Cv+"|"
+DK=[]
+for DC in self.scanResult[Cv].indexes
+values=self.scanResult[Cv][DC].join(",")
+DK.push(DC+Ej+values)
 end for
-DE=DE+DF.join("|")+char(10)
+DJ=DJ+DK.join("|")+char(Ei)
 end for
-DD.set_content(DE)
+DI.set_content(DJ)
 end function
-Al.loadResult=function
-X=AJ.vexxed[EK].host_computer
-if not X.File(EY) then
+Aq.loadResult=function
+Y=AQ.vexxed[EU].host_computer
+if not Y.File(Eh) then
 self.scanResult={}
 else
-BP=X.File(EY).get_content
-if BP.len==EJ then
+BU=Y.File(Eh).get_content
+if BU.len==ER then
 self.scanResult={}
 else
-DG=BP.split(char(10))
-for Cu in DG
-if Cu.trim.len==EJ then
+DL=BU.split(char(Ei))
+for Cz in DL
+if Cz.trim.len==ER then
 continue
 end if
-DH=Cu.split("\|")
-Cq=DH[EJ]
-DI=DH[EG:]
-self.scanResult[Cq]={}
-for DJ in DI
-DF=DJ.split(EZ)
-Cy=DF[EJ]
-values=DF[EG].split(",")
-self.scanResult[Cq][Cy]=values
+DM=Cz.split("\|")
+Cv=DM[ER]
+DN=DM[EJ:]
+self.scanResult[Cv]={}
+for DO in DN
+DK=DO.split(Ej)
+DC=DK[ER]
+values=DK[EJ].split(",")
+self.scanResult[Cv][DC]=values
 end for
 end for
 end if
 end if
 end function
-Al.resultObjects={}
-Al.crackLib=function(Cq,DK)
-self.resultObjects[Cq]=[]
-Cw=self.metaLibs[Cq]
-DL=self.scanResult[Cq]
-for Cy in DL.indexes
-for R in DL[Cy]
-Z=Cw.overflow(Cy,R,DK)
-if Z and typeof(Z)!="number" then
-if typeof(Z)==Dk then
-BM=new Ap
-BM.updateFileObject(Z)
-self.resultObjects[Cq].push(BM)
+Aq.resultObjects={}
+Aq.crackLib=function(Cv,DP)
+self.resultObjects[Cv]=[]
+DA=self.metaLibs[Cv]
+DQ=self.scanResult[Cv]
+for DC in DQ.indexes
+for S in DQ[DC]
+a=DA.overflow(DC,S,DP)
+if a and typeof(a)!="number" then
+if typeof(a)==Dt then
+BR=new Au
+BR.updateFileObject(a)
+self.resultObjects[Cv].push(BR)
 end if
-if typeof(Z)=="computer" then
-DM=new Bi
-DM.updateComputerObject(Z)
-self.resultObjects[Cq].push(DM)
+if typeof(a)=="computer" then
+DR=new Bn
+DR.updateComputerObject(a)
+self.resultObjects[Cv].push(DR)
 end if
-if typeof(Z)==Ea then
-CM=new Bz
-CM.updateShellObject(Z)
-self.resultObjects[Cq].push(CM)
+if typeof(a)==Ek then
+CR=new CD
+CR.updateShellObject(a)
+self.resultObjects[Cv].push(CR)
 end if
 end if
 end for
 end for
 end function
-Al.printVulns=function(Cq)
-print("Listing stored vulns for: "+Cq)
-Bx=Dw
-for Aa in range(EJ,self.resultObjects[Cq].len-EG,EG)
-Bx=Bx+(str(Aa)+Dx+self.resultObjects[Cq][Aa].getPerms+"    "+typeof(self.resultObjects[Cq][Aa].getObject)+"    "+self.resultObjects[Cq][Aa].getLANIP+ER)
+Aq.printVulns=function(Cv)
+print("Listing stored vulns for: "+Cv)
+CB=EG
+for h in range(ER,self.resultObjects[Cv].len-EJ,EJ)
+CB=CB+(str(h)+EH+self.resultObjects[Cv][h].getPerms+"    "+typeof(self.resultObjects[Cv][h].getObject)+"    "+self.resultObjects[Cv][h].getLANIP+Eb)
 end for
-print(format_columns(Bx))
+print(format_columns(CB))
 end function
-Al.handleInput=function(An)
-if An.len==EJ or not self.inputMap.hasMethod(An[EJ]) then
+Aq.handleInput=function(As)
+if As.len==ER or not self.inputMap.hasMethod(As[ER]) then
 return 
 end if
-Ao=@self.inputMap[An[EJ]]
-return Ao(self,An)
+At=@self.inputMap[As[ER]]
+return At(self,As)
 end function
-DN={}
-DN.clients=[]
-DN.inputMap={}
-DN.inputMap["list"]=function(AX,AY)
-AX.listClients
+DS={}
+DS.clients=[]
+DS.inputMap={}
+DS.inputMap["list"]=function(Ae,Af)
+Ae.listClients
 end function
-DN.inputMap["refresh"]=function(AX,AY)
-AX.updateClients(get_custom_object.vexxed[Eb])
+DS.inputMap["refresh"]=function(Ae,Af)
+Ae.updateClients(get_custom_object.vexxed[El])
 end function
-DN.inputMap["use"]=function(AX,AY)
-if AY.len<EL then
+DS.inputMap["use"]=function(Ae,Af)
+if Af.len<EW then
 print("Usage: revshell use [index]")
 return 
 end if
-CM=new Bz
-AX.setActiveClient(AY[EG].to_int,CM)
-if CM.getObject then
-AJ.vexxed[EF].addHandler(CM)
+CR=new CD
+Ae.setActiveClient(Af[EJ].to_int,CR)
+if CR.getObject then
+AQ.vexxed[EQ].addHandler(CR)
 end if
 end function
-DN.inputMap["install"]=function(AX,AY)
-AX.installServer
+DS.inputMap["install"]=function(Ae,Af)
+Ae.installServer
 end function
-DN.inputMap["connect"]=function(AX,AY)
-if AY.len<ES then
+DS.inputMap["connect"]=function(Ae,Af)
+if Af.len<Ec then
 print("Usage: revshell connect [ip] [port] [proc=Terminal.exe]")
 return 
 end if
-if not AY.hasIndex(ES) then
-AY.push("Terminal.exe")
+if not Af.hasIndex(Ec) then
+Af.push("Terminal.exe")
 end if
-AX.startClient(AY[EG],AY[EL].to_int,AY[ES])
+Ae.startClient(Af[EJ],Af[EW].to_int,Af[Ec])
 end function
-DN.inputMap["setlib"]=function(AX,AY)
-AX.setServerLib
+DS.inputMap["setlib"]=function(Ae,Af)
+Ae.setServerLib
 end function
-DN.getClients=function(DW)
-return DW.rshell_server
+DS.getClients=function(Db)
+return Db.rshell_server
 end function
-DN.updateClients=function(DW)
-self.clients=self.getClients(DW)
+DS.updateClients=function(Db)
+self.clients=self.getClients(Db)
 if self.clients isa list then
 print("Clients updated successfully.")
 else
 print(self.clients)
 end if
 end function
-DN.listClients=function
-if self.clients.len==EJ or self.clients isa string then
+DS.listClients=function
+if self.clients.len==ER or self.clients isa string then
 print("No shells connected.")
 return 
 end if
-for Aa in range(EJ,self.clients.len-EG)
-print("\n<b>Shell ("+(Aa)+")</b>\nPublic IP: "+self.clients[Aa].host_computer.public_ip+"\nLocal IP: "+self.clients[Aa].host_computer.local_ip)
+for h in range(ER,self.clients.len-EJ)
+print("\n<b>Shell ("+(h)+")</b>\nPublic IP: "+self.clients[h].host_computer.public_ip+"\nLocal IP: "+self.clients[h].host_computer.local_ip)
 end for
 end function
-DN.setActiveClient=function(AZ,DX)
-if self.clients[AZ] and self.clients isa list then
-DX.updateShellObject(self.clients[AZ])
+DS.setActiveClient=function(Ag,Dc)
+if self.clients[Ag] and self.clients isa list then
+Dc.updateShellObject(self.clients[Ag])
 else
-print("Shell at index "+AZ+" does not exist.")
+print("Shell at index "+Ag+" does not exist.")
 end if
 end function
-DN.setServerLib=function
-AJ.vexxed[Eb]=AJ.vexxed[EC]
+DS.setServerLib=function
+AQ.vexxed[El]=AQ.vexxed[EN]
 print("Server library set to remote Metaxploit.")
 end function
-DN.installServer=function
-AJ.vexxed[EF].currHandler.putFile("/root/VulnLibs/librshell.so")
-AJ.vexxed[EF].currHandler.moveFile("librshell.so","/lib/","librshell.so")
-DY=include_lib("/lib/librshell.so")
-if not DY then
+DS.installServer=function
+AQ.vexxed[EQ].currHandler.putFile("/root/VulnLibs/librshell.so")
+AQ.vexxed[EQ].currHandler.moveFile("librshell.so","/lib/","librshell.so")
+Dd=include_lib("/lib/librshell.so")
+if not Dd then
 print("Failed to install reverse shell server.")
 return 
 end if
-Z=DY.install_service
-if Z!=Dz then
-print("Error installing rshell: "+Z)
+a=Dd.install_service
+if a!=EF then
+print("Error installing rshell: "+a)
 end if
 end function
-DN.startClient=function(CQ,CR,DZ)
-AJ.vexxed[Eb].rshell_client(CQ,CR,DZ)
+DS.startClient=function(CV,CW,De)
+AQ.vexxed[El].rshell_client(CV,CW,De)
 end function
-DN.handleInput=function(An)
-if An.len==EJ or not self.inputMap.hasMethod(An[EJ]) then
+DS.handleInput=function(As)
+if As.len==ER or not self.inputMap.hasMethod(As[ER]) then
 return 
 end if
-Ao=@self.inputMap[An[EJ]]
-return Ao(self,An)
+At=@self.inputMap[As[ER]]
+return At(self,As)
 end function
 I={}
 I.startEngine=function
 self.printSplash
 self.promptPassword
 self.loadSession
-AJ.vexxed[Ec].loadResult
-CM=new Bz
-CM.updateShellObject(get_shell)
-AJ.vexxed[EF].addHandler(CM)
-DN.updateClients(AJ.vexxed[Eb])
+AQ.vexxed[Em].loadResult
+CR=new CD
+CR.updateShellObject(get_shell)
+AQ.vexxed[EQ].addHandler(CR)
+DS.updateClients(AQ.vexxed[El])
 self.promptUser
 end function
 I.loadSession=function
 if get_custom_object.hasIndex("vexxed") then
 print("Session found. Importing objects...")
-AK.importSession
+AR.importSession
 return 
 end if
 print("No session found or running from home. Creating new session...")
-AK.initSession
+AR.initSession
 end function
 I.printSplash=function
 print("\n ___      ___  _______  ___  ___  ___  ___  _______  ________   ")
@@ -1691,49 +1726,78 @@ print("    \\   /   (:      ""| /  \   \  /  \   \(:      ""||:       :) ")
 print("     \__/     \_______)|___/\___||___/\___|\_______)(________/  ")
 end function
 I.promptPassword=function
-An=user_input("Password: ",EG)
-if An!=Dw then
+As=user_input("Password: ",EJ)
+if As!=EG then
 exit("Wrong password, nice try.")
 end if
 end function
 I.promptUser=function
-while Dz
-An=user_input("["+AJ.vexxed[EF].currHandler.displayID+EZ+AJ.vexxed[EF].currHandler.getPubIP+EZ+AJ.vexxed[EF].currHandler.getLANIP+EH+AJ.vexxed[EF].sessionStack.len+"] "+AJ.vexxed[EF].currHandler.fileObject.path+"# ")
-self.handleInput(An.trim)
+while EF
+As=user_input("["+AQ.vexxed[EQ].currHandler.displayID+Ej+AQ.vexxed[EQ].currHandler.getPubIP+Ej+AQ.vexxed[EQ].currHandler.getLANIP+ES+AQ.vexxed[EQ].sessionStack.len+"] "+AQ.vexxed[EQ].currHandler.fileObject.path+"# ")
+self.handleInput(As.trim)
 end while
 end function
-I.handleInput=function(An)
-if An=="exit" then
-AJ.vexxed[EF].exitLayer
+I.handleInput=function(As)
+if As=="exit" then
+AQ.vexxed[EQ].exitLayer
 exit("Exiting...")
 end if
-if An=="clear" then
+if As=="clear" then
 clear_screen
 end if
-An=An.split("\|")
-for BQ in An
-BQ=BQ.trim.split(EH)
-BQ=BQ.wherenot(Dj,EJ)
-if BQ.len==EJ then
+As=As.split("\|")
+for BV in As
+BV=BV.trim.split(ES)
+BV=BV.wherenot(Ds,ER)
+if BV.len==ER then
 continue
 end if
-self.handleOutput(CU.handleInput(BQ))
-self.handleOutput(DN.handleInput(BQ[EG:]))
-self.handleOutput(AJ.vexxed[Ec].handleInput(BQ))
-self.handleOutput(AJ.vexxed[EF].handleInput(BQ))
-self.handleOutput(AJ.vexxed[EF].currHandler.handleInput(BQ))
-if BQ[EJ]=="dumpcob" then
-for Aa in AJ.indexes
-print(AJ[Aa])
+if self.checkRepeat then
+Dl=user_input("ExploitReport found. Please specify repeat interval in seconds: ")
+if Dl.trim==EG then
+Dl=EJ
+else
+Dl=Dl.trim.to_num
+end if
+end if
+while EF
+self.handleOutput(CZ.handleInput(BV))
+self.handleOutput(DS.handleInput(BV[EJ:]))
+self.handleOutput(AQ.vexxed[Em].handleInput(BV))
+self.handleOutput(AQ.vexxed[EQ].handleInput(BV))
+self.handleOutput(AQ.vexxed[EQ].currHandler.handleInput(BV))
+if self.checkRepeat then
+if typeof(Dl)==Dp then
+print("Invalid interval. Please specify a number.")
+break
+end if
+wait(Dl)
+else
+break
+end if
+end while
+if BV[ER]=="dumpcob" then
+for h in AQ.indexes
+print(AQ[h])
 end for
 end if
 end for
 end function
-I.handleOutput=function(Df)
-if typeof(Df)==Dg then
-print(Df)
-else if Df!=D_ then
-print(Df.toString)
+I.checkRepeat=function
+Dm=AQ.vexxed[EU].host_computer.show_procs.split(char(Ei))[EJ:]
+for Z in Dm
+Dn=Z.split(ES)
+if Dn[4:5][ER].trim=="ExploitReport" then
+return EF
+end if
+end for
+return EE
+end function
+I.handleOutput=function(Do)
+if typeof(Do)==Dp then
+print(Do)
+else if Do!=EK then
+print(Do.toString)
 end if
 end function
 I.startEngine
